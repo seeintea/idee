@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, JSX } from "react";
 import { SidebarProvider, Sidebar as UISidebar } from "~/components/ui/sidebar";
 
 import SidebarMenu from "./sidebar-menu";
