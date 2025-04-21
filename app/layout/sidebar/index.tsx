@@ -1,5 +1,5 @@
 import type { PropsWithChildren, JSX } from "react";
-import { SidebarProvider, Sidebar as UISidebar } from "~/components/ui/sidebar";
+import { SidebarProvider, Sidebar as UISidebar } from "~/components/shadcn-ui/ui/sidebar";
 
 import SidebarMenu from "./sidebar-menu";
 import config from "./config";

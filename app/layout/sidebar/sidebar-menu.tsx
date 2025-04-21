@@ -5,7 +5,7 @@ import {
   SidebarMenuButton,
   SidebarGroup,
   SidebarGroupLabel,
-} from "~/components/ui/sidebar";
+} from "~/components/shadcn-ui/ui/sidebar";
 
 import type { MenuItemsProps, MenuProps, GroupMenuProps } from "./index";
 

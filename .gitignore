@@ -1,12 +1,13 @@
 # Created by https://www.toptal.com/developers/gitignore/api/remix
 # Edit at https://www.toptal.com/developers/gitignore?templates=remix
 
-### Remix ###
+### React Router ###
 node_modules
 /.cache
 /build
 /public/build
 .env
+/.react-router/
 
 # End of https://www.toptal.com/developers/gitignore/api/remix
 
@@ -22,4 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+.vscode
 ### End of Custom ###
