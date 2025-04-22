@@ -16,7 +16,7 @@ export const links: Route.LinksFunction = () => [
     rel: "icon",
     type: "image/svg",
     sizes: "64x64",
-    href: "/favicon.svg",
+    href: "/images/favicon.svg",
   },
 ];
 

@@ -1,12 +1,12 @@
-import { Outlet } from "react-router";
-import Sidebar from "./sidebar";
+import { SidebarProvider } from "~/components/shadcn-ui/ui/sidebar";
+import Content from "./content";
+import AppSideBar from "./sidebar";
 
 export default function Layout() {
   return (
-    <Sidebar>
-      <main className={"p-5"}>
-        <Outlet />
-      </main>
-    </Sidebar>
+    <SidebarProvider>
+      <AppSideBar />
+      <Content />
+    </SidebarProvider>
   );
 }
