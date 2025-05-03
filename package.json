@@ -12,6 +12,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.0",
     "@react-router/node": "^7.5.1",
     "@react-router/serve": "^7.5.1",
     "class-variance-authority": "^0.7.1",

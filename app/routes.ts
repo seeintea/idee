@@ -1,8 +1,4 @@
-import { type RouteConfig, index, route } from "@react-router/dev/routes";
+import { type RouteConfig, index } from "@react-router/dev/routes";
+import { routes } from "./utils/routes";
 
-export default [
-  index("views/index.tsx"),
-  route("/javascript/view-transition-api", "views/javascript/view-transition-api.tsx"),
-  route("/react/memo-api", "views/react/memo-api.tsx"),
-  route("/playground/crypto-in-wasm", "views/playground/crypto-in-wasm.tsx"),
-] satisfies RouteConfig;
+export default [index("routes/index.tsx"), ...routes] satisfies RouteConfig;

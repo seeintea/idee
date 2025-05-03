@@ -1,3 +1,3 @@
 export default function ViewTransitionAPI() {
-  return "ViewTransitionAPI";
+  return "view transition api";
 }
