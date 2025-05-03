@@ -1,12 +1,4 @@
-import { SidebarProvider } from "~/components/shadcn-ui/ui/sidebar";
-import Content from "./content";
-import AppSideBar from "./sidebar";
+import AppLayout from "./app-layout";
+import ErrorBoundary from "./error-boundary";
 
-export default function Layout() {
-  return (
-    <SidebarProvider>
-      <AppSideBar />
-      <Content />
-    </SidebarProvider>
-  );
-}
+export { AppLayout, ErrorBoundary };
