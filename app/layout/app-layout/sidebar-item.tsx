@@ -12,7 +12,7 @@ const icons = {
 export default function SidebarItem(props: MenusItem) {
   return (
     <Fragment>
-      <Space align={"center"} className={"text-base text-secondary-foreground font-semibold gap-1 pt-2 pb-0.5"}>
+      <Space align={"center"} className={"text-base text-secondary-foreground font-semibold gap-1 py-2"}>
         {icons[props.group]}
         {props.group}
       </Space>
