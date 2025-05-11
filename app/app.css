@@ -49,8 +49,4 @@
   body {
     @apply text-sm text-foreground;
   }
-
-  .scrollbar-stable {
-    scrollbar-gutter: stable;
-  }
 }

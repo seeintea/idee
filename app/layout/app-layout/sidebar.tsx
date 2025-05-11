@@ -15,10 +15,12 @@ export default function Sidebar() {
             <p className={"text-xs cursor-pointer"}>leviegu@gmail.com</p>
           </div>
         </Space>
-        <div className={"w-full flex-1 overflow-y-auto pl-base pr-base-scroll scrollbar-stable"}>
-          {menus.map((menu) => (
-            <SidebarItem key={menu.group} {...menu} />
-          ))}
+        <div className={"w-full flex-1 overflow-y-auto pl-base pr-0"}>
+          <div className={"pr-base"}>
+            {menus.map((menu) => (
+              <SidebarItem key={menu.group} {...menu} />
+            ))}
+          </div>
         </div>
         <div className={"w-full px-base text-xs"}>
           <div className={"pt-base border-t-1"}>©{new Date().getFullYear()} leviegu</div>

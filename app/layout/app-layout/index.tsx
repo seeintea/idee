@@ -17,8 +17,8 @@ export default function AppLayout() {
       <Space asChild className={"flex-1 h-full"} direction={"vertical"}>
         <main>
           <Header />
-          <GlassmorphismCard className={"w-full flex-1 p-base overflow-hidden pr-base-scroll"}>
-            <div className={"w-full h-full overflow-y-auto scrollbar-stable"}>
+          <GlassmorphismCard className={"w-full flex-1 p-base overflow-hidden pr-0"}>
+            <div className={"w-full h-full overflow-y-auto pr-base"}>
               <Outlet />
             </div>
           </GlassmorphismCard>
