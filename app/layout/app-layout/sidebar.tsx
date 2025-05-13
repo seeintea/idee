@@ -9,10 +9,17 @@ export default function Sidebar() {
     <Space asChild direction={"vertical"} className={"w-64 h-full py-base"}>
       <GlassmorphismCard>
         <Space align={"center"} className={"px-base"}>
-          <img className={"rounded-sm w-10 h-10 overflow-hidden border"} src="/images/avatar.jpg" alt="avatar" />
+          <a href="/">
+            <img className={"rounded-sm w-10 h-10 overflow-hidden border"} src="/images/avatar.jpg" alt="avatar" />
+          </a>
           <div>
             <p className={"font-bold text-primary"}>leviegu</p>
-            <p className={"text-xs cursor-pointer"}>leviegu@gmail.com</p>
+            <button
+              className={"text-xs cursor-pointer"}
+              onClick={() => navigator.clipboard.writeText("leviegu@gmail.com")}
+            >
+              leviegu@gmail.com
+            </button>
           </div>
         </Space>
         <div className={"w-full flex-1 overflow-y-auto pl-base pr-base-scroll scrollbar-stable"}>
