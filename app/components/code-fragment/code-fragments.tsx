@@ -31,7 +31,7 @@ export default function CodeFragments(props: CodeFragmentsProps) {
     return null;
   }
   return (
-    <div className={cn("overflow-hidden rounded-xl", className)}>
+    <div className={cn("overflow-hidden rounded-base", className)}>
       <div className={cn("h-10 px-base border-b flex items-center justify-between", container)}>
         <Space className={cn("pt-3.5 gap-3 h-full", tabs)}>
           {items.map((item) => (

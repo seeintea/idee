@@ -1,9 +1,8 @@
 import { Outlet } from "react-router";
 import GlassmorphismCard from "~/components/glassmorphism-card";
-
+import Space from "~/components/space";
 import Sidebar from "./sidebar";
 import Header from "./header";
-import Space from "~/components/space";
 
 const grid =
   "bg-white bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]";
@@ -17,8 +16,8 @@ export default function AppLayout() {
       <Space asChild className={"flex-1 h-full"} direction={"vertical"}>
         <main>
           <Header />
-          <GlassmorphismCard className={"w-full flex-1 p-base overflow-hidden pr-base-scroll"}>
-            <div className={"w-full h-full overflow-y-auto scrollbar-stable"}>
+          <GlassmorphismCard className={"w-full flex-1 p-base scroll-wrapper"}>
+            <div className={"scroll-ctx"}>
               <Outlet />
             </div>
           </GlassmorphismCard>

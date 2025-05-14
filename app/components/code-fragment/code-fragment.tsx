@@ -17,7 +17,7 @@ export default function CodeBlock(props: CodeBlockProps) {
   return (
     <Highlight theme={themes$[theme]} code={code} language={language}>
       {({ style, tokens, getLineProps, getTokenProps }) => (
-        <pre style={style} className={cn("relative p-base rounded-xl", className)}>
+        <pre style={style} className={cn("relative p-base rounded-base", className)}>
           {tokens.map((line, idx) => (
             <div key={idx} {...getLineProps({ line })}>
               {line.map((token, key) => (
