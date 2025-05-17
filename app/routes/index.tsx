@@ -1,5 +1,14 @@
 import { Button } from "~/components/ui/button";
 import { CodeFragment, CodeFragments } from "~/components/code-fragment";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "~/components/ui/dialog";
 
 const fragment0 = `const GroceryItem: React.FC<GroceryItemProps> = ({ item }) => {
   return (
@@ -29,6 +38,28 @@ export default function Index() {
   return (
     <div className={"h-[1000px]"}>
       <div className={"flex gap-2"}>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Edit Profile</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit profile</DialogTitle>
+              <DialogDescription>Make changes to your profile here. Click save when you're done.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <input id="name" value="Pedro Duarte" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <input id="username" value="@peduarte" className="col-span-3" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <Button variant={"default"}>default</Button>
         <Button variant={"destructive"}>destructive</Button>
         <Button variant={"ghost"}>ghost</Button>
