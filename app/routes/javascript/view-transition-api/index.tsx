@@ -1,3 +1,10 @@
+import { Fragment } from "react/jsx-runtime";
+import BasicImpl from "./basic-impl";
+
 export default function ViewTransitionAPI() {
-  return "view transition api";
+  return (
+    <Fragment>
+      <BasicImpl />
+    </Fragment>
+  );
 }
