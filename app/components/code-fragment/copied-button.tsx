@@ -2,8 +2,8 @@ import { useState } from "react";
 import { GoFileCode, GoCheck } from "react-icons/go";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/utils/tailwind";
+import toast from "~/utils/toast";
 import themeConfig, { type Theme } from "./theme-config";
-
 interface CopiedButtonProps {
   className?: string;
   code: string;
@@ -19,6 +19,7 @@ export default function CopiedButton(props: CopiedButtonProps) {
 
   const handle = async () => {
     navigator.clipboard.writeText(code).then(async () => {
+      toast.success("Copied code to clipboard.");
       setCopied(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setCopied(false);

@@ -1,6 +1,8 @@
+import { Fragment } from "react/jsx-runtime";
 import { Outlet } from "react-router";
 import GlassmorphismCard from "~/components/glassmorphism-card";
 import Space from "~/components/space";
+import { Toaster } from "~/components/ui/toaster";
 import Sidebar from "./sidebar";
 import Header from "./header";
 
@@ -11,18 +13,21 @@ const before =
 
 export default function AppLayout() {
   return (
-    <Space className={`w-screen h-screen p-base ${grid} ${before}`}>
-      <Sidebar />
-      <Space asChild className={"flex-1 h-full"} direction={"vertical"}>
-        <main>
-          <Header />
-          <GlassmorphismCard className={"w-full flex-1 p-base scroll-wrapper"}>
-            <div className={"scroll-ctx"}>
-              <Outlet />
-            </div>
-          </GlassmorphismCard>
-        </main>
+    <Fragment>
+      <Space className={`w-screen h-screen p-base ${grid} ${before}`}>
+        <Sidebar />
+        <Space asChild className={"flex-1 h-full"} direction={"vertical"}>
+          <main>
+            <Header />
+            <GlassmorphismCard className={"w-full flex-1 p-base scroll-wrapper"}>
+              <div className={"scroll-ctx"}>
+                <Outlet />
+              </div>
+            </GlassmorphismCard>
+          </main>
+        </Space>
       </Space>
-    </Space>
+      <Toaster />
+    </Fragment>
   );
 }

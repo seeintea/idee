@@ -1,10 +1,16 @@
 import GlassmorphismCard from "~/components/glassmorphism-card";
 import Space from "~/components/space";
 import { menus } from "~/utils/routes";
-
+import toast from "~/utils/toast";
 import SidebarItem from "./sidebar-item";
 
 export default function Sidebar() {
+  const onCopied = () => {
+    navigator.clipboard.writeText("leviegu@gmail.com").then(() => {
+      toast.success("Copied e-mail to clipboard.");
+    });
+  };
+
   return (
     <Space asChild direction={"vertical"} className={"w-64 h-full py-base"}>
       <GlassmorphismCard>
@@ -14,10 +20,7 @@ export default function Sidebar() {
           </a>
           <div>
             <p className={"font-bold text-primary"}>leviegu</p>
-            <button
-              className={"text-xs cursor-pointer"}
-              onClick={() => navigator.clipboard.writeText("leviegu@gmail.com")}
-            >
+            <button className={"text-xs cursor-pointer"} onClick={onCopied}>
               leviegu@gmail.com
             </button>
           </div>
