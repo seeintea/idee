@@ -1,5 +1,13 @@
 import { Fragment, useRef, useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/components/ui/dialog";
+import {
+  Dialog,
+  DialogPureContent,
+  DialogOverlay,
+  DialogPortal,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import ListItem from "./list-item";
 import data, { type Item } from "./data";
 import { CodeFragment } from "~/components/code-fragment";
@@ -31,6 +39,8 @@ const code = `const onAction = (element: HTMLElement, data: Item) => {
     prevent.current = false
   }, 650);
 }`;
+
+const dialogTransition = "transition-[opacity] duration-600 ease-in";
 
 export default function BasicImpl() {
   const image = useRef<HTMLImageElement>(null);
@@ -86,25 +96,25 @@ export default function BasicImpl() {
         ))}
       </div>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent
-          className={"sm:max-w-2xl transition-[opacity] duration-600 ease-in"}
-          style={{ opacity: dialogOpacity }}
-        >
-          <DialogHeader>
-            <DialogTitle>{selected?.title}</DialogTitle>
-            <DialogDescription></DialogDescription>
-          </DialogHeader>
-          <div className={"flex gap-base"}>
-            <img
-              ref={image}
-              className={"w-[350px] shrink-0 rounded-base"}
-              src={selected?.url}
-              alt={selected?.title}
-              style={{ opacity: imageOpacity }}
-            />
-            <div>{selected?.desc}</div>
-          </div>
-        </DialogContent>
+        <DialogPortal data-slot="dialog-portal">
+          <DialogOverlay className={dialogTransition} style={{ opacity: dialogOpacity }} />
+          <DialogPureContent className={`sm:max-w-2xl ${dialogTransition}`} style={{ opacity: dialogOpacity }}>
+            <DialogHeader>
+              <DialogTitle>{selected?.title}</DialogTitle>
+              <DialogDescription></DialogDescription>
+            </DialogHeader>
+            <div className={"flex gap-base"}>
+              <img
+                ref={image}
+                className={"w-[350px] shrink-0 rounded-base"}
+                src={selected?.url}
+                alt={selected?.title}
+                style={{ opacity: imageOpacity }}
+              />
+              <div>{selected?.desc}</div>
+            </div>
+          </DialogPureContent>
+        </DialogPortal>
       </Dialog>
       <CodeFragment className={"mt-base"} code={code} language="ts" />
     </Fragment>
