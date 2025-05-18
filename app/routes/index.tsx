@@ -9,6 +9,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "~/components/ui/dialog";
+import Typography from "~/components/typography";
 
 const fragment0 = `const GroceryItem: React.FC<GroceryItemProps> = ({ item }) => {
   return (
@@ -37,6 +38,41 @@ const fragments = [
 export default function Index() {
   return (
     <div className={"h-[1000px]"}>
+      <div className={"flex gap-2 flex-col"}>
+        <Typography type="h1">Material Tailwind (H1)</Typography>
+        <Typography type="h2">Material Tailwind (H2)</Typography>
+        <Typography type="h3">Material Tailwind (H3)</Typography>
+        <Typography type="h4">Material Tailwind (H4)</Typography>
+        <Typography type="h5">Material Tailwind (H5)</Typography>
+        <Typography type="h6">Material Tailwind (H6)</Typography>
+        <Typography>
+          Material Tailwind is an easy to use components library for Tailwind CSS and Material Design. It provides a
+          simple way to customize your components, you can change the colors, fonts, breakpoints and everything you
+          need.
+        </Typography>
+        <Typography type="lead">
+          Material Tailwind is an easy to use components library for Tailwind CSS and Material Design. It provides a
+          simple way to customize your components, you can change the colors, fonts, breakpoints and everything you
+          need.
+        </Typography>
+        <Typography type="small">
+          Material Tailwind is an easy to use components library for Tailwind CSS and Material Design. It provides a
+          simple way to customize your components, you can change the colors, fonts, breakpoints and everything you
+          need.
+        </Typography>
+        <Typography type="h1" color="primary">
+          Material Tailwind
+        </Typography>
+        <Typography type="h1" color="secondary">
+          Material Tailwind
+        </Typography>
+        <Typography type="h1" color="info">
+          Material Tailwind
+        </Typography>
+        <Typography type="h1" color="error">
+          Material Tailwind
+        </Typography>
+      </div>
       <div className={"flex gap-2"}>
         <Dialog>
           <DialogTrigger asChild>
