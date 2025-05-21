@@ -23,6 +23,8 @@
   --destructive-foreground: oklch(1 0 0);
   --popover: oklch(0.97 0 0);
   --popover-foreground: oklch(0.32 0 0);
+  --card: oklch(0.96 0 0);
+  --card-foreground: oklch(0.24 0 0);
 }
 
 @theme inline {
@@ -46,6 +48,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
 }
 
 @layer base {

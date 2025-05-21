@@ -9,7 +9,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "~/components/ui/dialog";
-import Typography from "~/components/typography";
+import Typography from "~/components/ui/typography";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 
 const fragment0 = `const GroceryItem: React.FC<GroceryItemProps> = ({ item }) => {
   return (
@@ -38,6 +39,16 @@ const fragments = [
 export default function Index() {
   return (
     <div className={"h-[1000px]"}>
+      <div className={"pb-2 flex gap-4 flex-col"}>
+        <Alert>
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>You can add components to your app using the cli.</AlertDescription>
+        </Alert>
+        <Alert variant={"destructive"}>
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>You can add components to your app using the cli.</AlertDescription>
+        </Alert>
+      </div>
       <div className={"flex gap-2 flex-col"}>
         <Typography type="h1">Material Tailwind (H1)</Typography>
         <Typography type="h2">Material Tailwind (H2)</Typography>
