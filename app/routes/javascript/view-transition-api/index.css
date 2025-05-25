@@ -1,0 +1,7 @@
+.view-transition-api {
+  view-transition-name: vta;
+}
+
+::view-transition-group(vta) {
+  animation-duration: 0.45s;
+}
