@@ -4,9 +4,9 @@
   --base-padding: calc(var(--spacing) * 4);
   --padding-scroll-wrapper: 4px;
   --padding-scroll-ctx: calc(var(--base-padding) - var(--padding-scroll-wrapper));
-  --base-radius: 0;
+  --base-radius: var(--radius-xl);
 
-  --border: oklch(0.2478 0 0);
+  --border: oklch(0.92 0 0);
   --input: oklch(0.91 0 0);
   --ring: oklch(0.49 0 0);
   --background: oklch(0.96 0 0);

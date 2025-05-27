@@ -5,7 +5,7 @@ interface GlassmorphismCardProps {
 
 export default function GlassmorphismCard(props: GlassmorphismCardProps) {
   return (
-    <div className={`rounded-3xl bg-[#ffffff4d] backdrop-blur-[1px] border-1 ${props.className || ""}`}>
+    <div className={`rounded-base bg-[#ffffff4d] backdrop-blur-[1px] border-1 ${props.className || ""}`}>
       {props.children}
     </div>
   );
