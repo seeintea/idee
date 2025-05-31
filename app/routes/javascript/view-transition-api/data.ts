@@ -8,28 +8,28 @@ const prefix = "/images/routes/view-transition-api";
 
 const data: Item[] = [
   {
-    title: "哆啦A梦：大雄与梦幻三剑士",
-    desc: "现实世界里的大雄一事无成，利用哆啦A梦的造梦机，在梦境世界却成为英雄剑士，与妖怪军团作战，但是梦境渐渐与现实交错，发生不可思议的事情。大雄使用了哆啦A梦的任意选择梦境机套装，并配上“梦幻三剑士”的盒带，把他带进了一个超真实的梦幻世界，在梦之国当中——亚米鲁曼王国正被妖灵大帝侵略。而大雄为救静香公主并与她结婚，决定起肩负打倒妖灵大帝奥多罗姆的重任。 到底得到白银之剑而变身成白银剑士的大雄，与好友小夫、胖虎、静香及变身成魔法师的哆啦A梦在梦境中会遇到什么困难呢……",
+    title: "Doraemon: Nobita's Three Visionary Swordsmen",
+    desc: `Doraemon: Nobita's Three Visionary Swordsmen (ドラえもん: のび太と夢幻三剣士, Doraemon: Nobita to Mugen Sankenshi) is a 1994 Japanese animated science fantasy film which premiered in Japan on March 12, 1994, based on the 14th volume of the same name of the Doraemon Long Stories series. This film marks the 15th anniversary of the Doraemon television series on TV Asahi. It's the 15th Doraemon film.`,
     url: `${prefix}/vta-001.webp`,
   },
   {
-    title: "哆啦A梦：大雄的人鱼大海战",
-    desc: "在利用哆啦A梦的秘密道具所创造出来的海底世界中，正与鱼儿们玩耍的大雄和哆啦A梦一行人，偶然遇见迷路的人鱼族公主-苏菲亚，据说“人鱼族”是在五千年前从外太空迁移到地球生活。而穿上人鱼服的哆啦A梦一行人和苏菲亚一同前往海底世界，原以为会是段愉快的冒险旅程，却在路途上遭遇巨大怪鱼的袭击，虽然有惊无险地逃过一劫，但静香竟被神秘怪客给抓走了。而在哆啦Ａ梦一行人抵达人鱼族宫殿后，得知“人鱼之剑”强大力量的神奇传说，还发现抓走静香的神秘怪客是人鱼族五千年来的宿敌、觊觎“人鱼之剑”已久的“怪鱼族”！为了救回静香及守护人鱼宝剑，哆啦A梦与大雄决定挺身而出，与人鱼族一起同心协力对抗怪鱼族！",
+    title: "Doraemon: Nobita's Great Battle of the Mermaid King",
+    desc: `Doraemon: Nobita's Great Battle of the Mermaid King (ドラえもん のび太の人魚大海戦, Doraemon: Nobita no Ningyo Daikaisen) is a 2010 Japanese animated science fantasy action adventure film based on the manga and anime series Doraemon, and is the 30th Doraemon film. The film was released in Japan on March 6, 2010.`,
     url: `${prefix}/vta-002.webp`,
   },
   {
-    title: "哆啦A梦：伴我同行",
-    desc: "结合了原作中《从未来之国千里迢迢而来》、《蛋中的静香》、《静香！再见！》、《雪山上的浪漫史》、《大雄的结婚前夜》、《再见哆啦A梦》和《哆啦A梦回来了》等篇目的经典剧情。",
+    title: "Stand by Me Doraemon",
+    desc: `The film is primarily based on the first chapter of the manga "All the Way From the Future", the 1973 chapter "Mountain Rescue", the 1980 chapter "Goodbye Shizuka", the 1984 chapter "Imprinting Shizuka", the 1998 short film "Doraemon Comes Back" and the 1999 short film "Doraemon: Nobita's Night Before a Wedding", though several other chapters are briefly brought up as well.`,
     url: `${prefix}/vta-003.webp`,
   },
   {
-    title: "哆啦A梦：大雄的地球交响乐",
-    desc: "为了参加学校的音乐会，大雄努力练习不擅长的竪笛，这时神秘的少女米佳突然出现在他面前。米佳很喜欢大雄悠闲自在的音色，于是邀请哆啦A梦一行人前往以音乐为能量的“珐籁殿堂”。为了让珐籁殿堂复苏，米佳正在找寻一起演奏音乐的专家，哆啦A梦使用道具“音乐家执照”让大家演奏帮助殿堂复苏的音乐，此时，将音乐从世界上消除的可怕生物也朝着他们袭来。",
+    title: "Doraemon: Nobita's Earth Symphony",
+    desc: `Doraemon the Movie: Nobita's Earth Symphony (映画ドラえもん のび太の地球交響楽, Eiga Doraemon Nobita no Chikyū Shinfonī) is a 2024 Japanese animated musical fantasy science fiction adventure film. It is the 43rd Doraemon feature film. Directed by Kazuaki Imai from a screenplay by Teruko Utsumi, it was released theatrically in Japan on March 1, 2024.`,
     url: `${prefix}/vta-004.webp`,
   },
   {
-    title: "哆啦A梦：伴我同行2",
-    desc: "以原作《奶奶的回忆》为基础，并将大雄与静香结婚当天作为舞台，完整描绘出「大雄与静香的结婚典礼」，从而展开一场连结「过去」、「现在」、「未来」的崭新「哆啦A梦」故事。",
+    title: "Stand by Me Doraemon 2",
+    desc: `Stand by Me Doraemon 2 (STAND BY ME ドラえもん 2) is a 2020 Japanese animated science fiction comedy film based on the Doraemon manga series and a sequel to the previous movie, the 2014 film Stand by Me Doraemon. Directed by Ryūichi Yagi and Takashi Yamazaki, it is primarily inspired by Doraemon's 2000 short film Doraemon: A Grandmother's Recollections and Doraemon's 2002 short film The Day When I Was Born.`,
     url: `${prefix}/vta-005.webp`,
   },
 ];
