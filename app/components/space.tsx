@@ -2,7 +2,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "~/utils/tailwind";
 
-const spaceVariants = cva("flex gap-4", {
+const spaceVariants = cva("flex gap-base", {
   variants: {
     align: {
       start: "items-start",

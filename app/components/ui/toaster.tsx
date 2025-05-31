@@ -1,3 +1,7 @@
+// MIT License
+// Copyright (c) 2023 shadcn
+// https://github.com/shadcn-ui/ui/blob/main/apps/www/registry/new-york/ui/sonner.tsx
+
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
@@ -8,13 +12,14 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
-      style={
-        {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
-        } as React.CSSProperties
-      }
+      toastOptions={{
+        style: {
+          borderRadius: "var(--base-radius)",
+          borderColor: "var(--border)",
+          backgroundColor: "var(--popover)",
+          color: "var(--popover-foreground)",
+        },
+      }}
       {...props}
     />
   );
