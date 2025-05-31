@@ -25,8 +25,8 @@ export default function Sidebar() {
             </button>
           </div>
         </Space>
-        <div className={"w-full flex-1 pl-base scroll-wrapper"}>
-          <div className={"scroll-ctx"}>
+        <div className={"w-full flex-1 pl-base wrapper-with-scrollbar"}>
+          <div className={"content-with-scrollbar"}>
             {menus.map((menu) => (
               <SidebarItem key={menu.group} {...menu} />
             ))}
