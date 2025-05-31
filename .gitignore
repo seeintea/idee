@@ -24,4 +24,6 @@ yarn-error.log*
 .pnpm-debug.log*
 
 .vscode
+.idea
+.vercel
 ### End of Custom ###
