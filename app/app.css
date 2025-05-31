@@ -7,16 +7,36 @@
 
   --spacing-content: var(--max-content-width);
   --spacing-base: var(--base-spacing);
+  --spacing-base/2: calc(var(--spacing-base) / 2);
   --spacing-wrapper-with-scrollbar: var(--wrapper-with-scrollbar-spacing);
   --spacing-content-with-scrollbar: var(--content-with-scrollbar-spacing);
   --radius-base: var(--base-radius);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
 }
 
 @layer base {
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--foreground) transparent;
+    scrollbar-color: var(--border) transparent;
     scroll-behavior: smooth;
+    @apply border-border
   }
 
   body {
@@ -34,6 +54,6 @@
 
   .background {
     @apply bg-background bg-[size:6rem_4rem];
-    @apply bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)]
+    background-image: var(--background-gradient);
   }
 }

@@ -10,7 +10,7 @@ export default function AppLayout() {
   return (
     <Fragment>
       <div className={`w-screen h-screen p-base background`}>
-        <Space className={"max-w-[1440px] h-full m-auto"}>
+        <Space className={"max-w-content h-full m-auto"}>
           <Sidebar />
           <Space asChild className={"flex-1 h-full overflow-x-hidden"} direction={"vertical"}>
             <main>
