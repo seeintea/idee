@@ -1,17 +1,24 @@
-# Created by https://www.toptal.com/developers/gitignore/api/remix
-# Edit at https://www.toptal.com/developers/gitignore?templates=remix
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-### React Router ###
-node_modules
-/.cache
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
 /build
-/public/build
-.env
-/.react-router/
-
-# End of https://www.toptal.com/developers/gitignore/api/remix
-
-### Custom ###
 
 # misc
 .DS_Store
@@ -23,7 +30,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-.vscode
-.idea
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
 .vercel
-### End of Custom ###
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
