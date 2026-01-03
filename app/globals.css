@@ -44,6 +44,16 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* base spacing */
+  --base-spacing: calc(var(--spacing) * 4); /* ~ 16px */
+  --base-radius: calc(var(--spacing) * 2); /* ~8px */
+  --spacing-base: var(--base-spacing);
+  --spacing-base/2: calc(var(--spacing-base) / 2);
+  --radius-base: var(--base-radius);
+  --background-gradient:
+    linear-gradient(to right, var(--secondary) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--secondary) 1px, transparent 1px);
 }
 
 :root {
@@ -117,9 +127,14 @@
 
 @layer base {
   * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    scroll-behavior: smooth;
     @apply border-border outline-ring/50;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply text-sm text-foreground bg-background bg-size-[6rem_4rem];
+    background-image: var(--background-gradient);
   }
 }
