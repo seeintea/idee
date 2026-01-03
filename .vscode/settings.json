@@ -1,0 +1,11 @@
+{
+  "cSpell.words": ["IDÉE", "idee"],
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[typescriptreact]": { "editor.defaultFormatter": "prettier.prettier-vscode" },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "explicit"
+  }
+}
