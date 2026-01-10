@@ -1,5 +1,5 @@
 {
-  "cSpell.words": ["IDÉE", "idee", "Glassmorphism"],
+  "cSpell.words": ["IDÉE", "idee"],
   "editor.formatOnSave": true,
   "[typescript]": {
     "editor.defaultFormatter": "prettier.prettier-vscode"
