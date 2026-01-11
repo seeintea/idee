@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -16,5 +16,13 @@
   * {
     scrollbar-width: thin;
     scroll-behavior: smooth;
+  }
+
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    font-family: "Source Han Serif SC VF";
   }
 }

@@ -3,5 +3,5 @@ export default function EOYReviewLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <main className={"w-5xl mx-auto py-6"}>{children}</main>;
+  return <article className="prose prose-zinc mx-auto px-6 md:px-0 py-24 lg:max-w-[72ch]">{children}</article>;
 }
