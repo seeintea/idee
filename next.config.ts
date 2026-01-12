@@ -9,4 +9,17 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default createMDX({})(nextConfig);
+export default createMDX({
+  options: {
+    rehypePlugins: [
+      "rehype-slug",
+      [
+        "rehype-autolink-headings",
+        {
+          properties: { className: ["anchor"] },
+          behavior: "wrap",
+        },
+      ],
+    ],
+  },
+})(nextConfig);
