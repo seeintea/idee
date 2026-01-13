@@ -1,4 +1,5 @@
 import createMDX from "@next/mdx";
+import type { CodeHikeConfig } from "codehike/mdx";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -9,8 +10,14 @@ const nextConfig: NextConfig = {
   },
 };
 
+const chConfig: CodeHikeConfig = {
+  components: { code: "Code" },
+};
+
 export default createMDX({
   options: {
+    remarkPlugins: [["remark-codehike", chConfig]],
+    recmaPlugins: [["recma-codehike", chConfig]],
     rehypePlugins: [
       "rehype-slug",
       [

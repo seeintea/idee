@@ -1,7 +1,11 @@
 import type { MDXComponents } from "mdx/types";
 
-const components: MDXComponents = {};
+import { Code } from "@/component/markdown/code";
 
-export function useMDXComponents(): MDXComponents {
-  return components;
+const components: MDXComponents = {
+  Code,
+};
+
+export function useMDXComponents(overrideComponents: MDXComponents): MDXComponents {
+  return { ...overrideComponents, ...components };
 }

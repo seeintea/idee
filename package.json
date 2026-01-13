@@ -14,6 +14,7 @@
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^16.1.1",
+    "codehike": "^1.0.7",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
@@ -21,7 +22,9 @@
     "react-dom": "19.2.3",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
-    "sonner": "^2.0.7"
+    "sonner": "^2.0.7",
+    "recma-codehike": "^0.0.1",
+    "remark-codehike": "^0.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.10",
