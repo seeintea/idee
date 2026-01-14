@@ -1,5 +1,5 @@
 {
-  "cSpell.words": ["IDÉE", "idee", "embla", "codehike", "recma"],
+  "cSpell.words": ["IDÉE", "idee", "embla", "codehike", "recma", "rslog"],
   "editor.formatOnSave": true,
   "[typescript]": {
     "editor.defaultFormatter": "prettier.prettier-vscode"
