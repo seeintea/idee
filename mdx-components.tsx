@@ -2,7 +2,7 @@ import type { MDXComponents } from "mdx/types";
 
 import { Code } from "@/component/markdown/code";
 
-const components: MDXComponents = {
+export const components: MDXComponents = {
   Code,
 };
 
