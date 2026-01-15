@@ -6,6 +6,7 @@ export const documents = mdx.map((document) => {
   const { file, default: MDXComponent, frontmatter, toc } = document;
   const match = /^\/content(.+)\.mdx$/u.exec(file);
   const id = match ? match[1] : file;
+  const slug = id.split("/").slice(1);
 
   const flatToc: Omit<TocObject, "children">[] = [];
   const visit = (node: TocObject) => {
@@ -19,6 +20,7 @@ export const documents = mdx.map((document) => {
     id,
     toc: flatToc,
     meta: frontmatter,
+    slug,
     MDXComponent,
   };
 });

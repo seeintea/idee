@@ -1,7 +1,7 @@
 interface TocObject {
   depth: number;
   value: string;
-  attributes: unknown;
+  attributes: Record<string, unknown>;
   children: TocObject[];
 }
 

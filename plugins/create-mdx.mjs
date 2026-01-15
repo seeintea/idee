@@ -19,7 +19,7 @@ export function createMDX(options = {}) {
   // pnpm run dev -> Ctrl + C 之后会再次调用一次 next dev
   // 也许不是这个 pr 引发的，但目前只能到这里结束了
   const [command] = process.argv.slice(2).filter((arg) => !arg.startsWith("-"));
-  if (command === "dev") {
+  if (["dev", "start"].includes(command)) {
     return (nextConfig) => nextConfig;
   }
 

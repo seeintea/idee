@@ -1,48 +1,32 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type Heading = { id: string; text: string; depth: number };
+type PureTocObject = Omit<TocObject, "children">;
 
-function collectHeadings(root: HTMLElement | null): Heading[] {
-  if (!root) return [];
-  const nodes = Array.from(root.querySelectorAll("h2, h3"));
-  return nodes
-    .map((el) => {
-      const id = el.getAttribute("id") || "";
-      const text = (el.textContent || "").trim();
-      const depth = el.tagName.toLowerCase() === "h2" ? 2 : 3;
-      return { id, text, depth };
-    })
-    .filter((h) => h.id && h.text);
+function getIdFromItem(item: PureTocObject): string {
+  const attrId = typeof item.attributes?.id === "string" ? (item.attributes?.id as string) : "";
+  if (attrId) return attrId;
+  const val = (item.value || "").trim();
+  return val;
 }
 
-type TocProps = { rootId: string; className?: string; offsetTop?: number };
+type TableOfContentsProps = {
+  items: PureTocObject[];
+  rootId: string;
+  className?: string;
+  offsetTop?: number;
+};
 
-export function Toc({ rootId, className = "", offsetTop = 96 }: TocProps) {
-  const [items, setItems] = useState<Heading[]>([]);
+export function TableOfContents({ items, rootId, className = "", offsetTop = 96 }: TableOfContentsProps) {
   const [activeIds, setActiveIds] = useState<Set<string>>(() => new Set());
-  const [scanned, setScanned] = useState(false);
   const lastActiveIdsRef = useRef<Set<string>>(new Set());
 
-  useEffect(() => {
-    const el = document.getElementById(rootId);
-    if (!el) return;
-    const update = () => {
-      setItems(collectHeadings(el));
-      setScanned(true);
-    };
-    update();
-    const observer = new MutationObserver(() => update());
-    observer.observe(el, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, [rootId]);
-
-  const orderedIds = useMemo(() => items.map((i) => i.id), [items]);
+  const orderedIds = useMemo(() => items.map((i) => getIdFromItem(i)).filter(Boolean), [items]);
 
   useEffect(() => {
     const root = document.getElementById(rootId);
     if (!root) return;
-    if (items.length === 0) return;
+    if (orderedIds.length === 0) return;
 
     const getDocY = (node: HTMLElement) => node.getBoundingClientRect().top + window.scrollY;
     const getHeadingNode = (id: string) => root.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
@@ -100,35 +84,25 @@ export function Toc({ rootId, className = "", offsetTop = 96 }: TocProps) {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
-  }, [rootId, offsetTop, items.length, orderedIds]);
+  }, [rootId, offsetTop, orderedIds]);
 
   const body = (() => {
-    if (!scanned) {
-      const rows = ["w-28", "w-24", "w-32", "w-20", "w-22"];
-      return (
-        <div className="space-y-2">
-          {rows.map((w) => (
-            <div key={w} className={`h-3 ${w} rounded bg-zinc-200/70`} />
-          ))}
-        </div>
-      );
-    }
-
     if (items.length > 0) {
       return (
         <ul className="space-y-2 text-sm">
-          {items.map((h) => {
-            const isActive = activeIds.has(h.id);
+          {items.map((toc, idx) => {
+            const id = orderedIds[idx] || "";
+            const isActive = id ? activeIds.has(id) : false;
             return (
-              <li key={h.id} className={h.depth === 3 ? "pl-4" : ""}>
+              <li key={`${id}-${toc.depth}`} className={toc.depth === 3 ? "pl-4" : ""}>
                 <a
-                  href={`#${h.id}`}
+                  href={id ? `#${id}` : undefined}
                   aria-current={isActive ? "true" : undefined}
                   className={
                     isActive ? "text-zinc-900 font-medium" : "text-zinc-400 hover:text-zinc-900 transition-colors"
                   }
                 >
-                  {h.text}
+                  {toc.value}
                 </a>
               </li>
             );

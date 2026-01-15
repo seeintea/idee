@@ -1,4 +1,4 @@
-import { highlight, Pre, type HighlightedCode, type RawCode } from "codehike/code";
+import { type HighlightedCode, highlight, Pre, type RawCode } from "codehike/code";
 
 import { wordWrap } from "./word-wrap";
 
