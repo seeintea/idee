@@ -1,11 +1,20 @@
-import { withMdxWorker } from "./plugins/create-mdx.mjs";
+import { createMDX } from "./plugins/create-mdx.mjs";
 
+/**
+ * @typedef {import('next').NextConfig} NextConfig
+ */
 const nextConfig = {
   reactCompiler: true,
-  pageExtensions: ["tsx", "mdx", "ts", "md", "js", "jsx"],
+  pageExtensions: ["tsx", "ts", "js", "jsx"],
   experimental: {
     viewTransition: true,
   },
 };
 
-export default withMdxWorker(nextConfig);
+const withMDX = createMDX({
+  dir: "content",
+  output: ".content",
+  logger: false,
+});
+
+export default withMDX(nextConfig);
