@@ -9,15 +9,19 @@ export function AppHeader() {
         <Image
           width={50}
           height={50}
-          className="rounded border border-zinc-200"
+          className="border border-border"
           src="/avatar.webp"
           alt="avatar"
           loading="eager"
         />
       </a>
-      <div>
-        <p className="font-bold text-primary">leviegu</p>
-        <CopiedButton className="text-xs cursor-pointer" copiedText="leviegu@gmail.com" afterCopiedMsg="邮箱已复制" />
+      <div className={"leading-[1.2]"}>
+        <p className="font-bold text-lg">leviegu</p>
+        <CopiedButton
+          className="text-sm cursor-pointer text-secondary"
+          copiedText="leviegu@gmail.com"
+          afterCopiedMsg="邮箱已复制"
+        />
       </div>
     </header>
   );
