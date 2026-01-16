@@ -4,9 +4,29 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-ring: var(--ring);
+  --color-border: var(--border);
+
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
 }
 
 :root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(13% 0.028 261.692);
+
+  --border: color-mix(in oklab, oklch(13% 0.028 261.692), white 90%);
+  --ring: color-mix(in oklab, oklch(13% 0.028 261.692), white 90%);
+
+  --primary: oklch(13% 0.028 261.692);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(37.3% 0.034 259.733);
+  --secondary-foreground: oklch(70.7% 0.022 261.325);
 }
 
 .dark {
@@ -14,15 +34,12 @@
 
 @layer base {
   * {
+    @apply border-border outline-ring/50 scroll-smooth;
     scrollbar-width: thin;
-    scroll-behavior: smooth;
-  }
-
-  html {
-    font-size: 16px;
   }
 
   body {
-    font-family: "Source Han Serif SC VF";
+    @apply bg-background text-primary;
+    font-family: "Source Han Serif CN VF";
   }
 }
