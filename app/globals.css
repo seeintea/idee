@@ -6,30 +6,28 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
   --color-ring: var(--ring);
   --color-border: var(--border);
-
-  --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
-  --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(13% 0.028 261.692);
-
-  --border: color-mix(in oklab, oklch(13% 0.028 261.692), white 90%);
-  --ring: color-mix(in oklab, oklch(13% 0.028 261.692), white 90%);
-
-  --primary: oklch(13% 0.028 261.692);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(37.3% 0.034 259.733);
-  --secondary-foreground: oklch(70.7% 0.022 261.325);
+  --background: var(--color-white);
+  --foreground: var(--color-zinc-950);
+  --border: color-mix(in oklab, var(--color-zinc-950), white 90%);
+  --ring: color-mix(in oklab, var(--color-zinc-950), white 90%);
+  --primary: var(--color-zinc-950);
+  --secondary: var(--color-gray-700);
 }
 
 .dark {
+  --background: var(--color-zinc-950);
+  --foreground: var(--color-white);
+  --border: color-mix(in oklab, var(--color-white) 10%, transparent);
+  --ring: color-mix(in oklab, var(--color-white) 10%, transparent);
+  --primary: var(--color-white);
+  --secondary: var(--color-gray-300);
 }
 
 @layer base {

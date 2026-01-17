@@ -14,9 +14,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
 
   return (
     <>
-      <div className={"max-w-2xl mx-auto py-12"}>
-        <AppHeader />
-      </div>
+      <AppHeader className="max-w-2xl mx-auto" />
       <div className="w-full grid auto-cols-max grid-flow-col justify-center gap-6">
         <div className={"hidden lg:block w-56"}></div>
 

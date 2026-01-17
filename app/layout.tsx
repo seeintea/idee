@@ -15,8 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body className={"antialiased"}>
-        {children}
-        <Toaster />
+        <main className={"py-12"}>
+          {children}
+          <Toaster />
+        </main>
       </body>
     </html>
   );

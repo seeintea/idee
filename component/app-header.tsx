@@ -2,9 +2,9 @@ import Image from "next/image";
 
 import { CopiedButton } from "@/component/copied-button";
 
-export function AppHeader() {
+export function AppHeader({ className = "" }: { className?: string }) {
   return (
-    <header className="flex gap-4 items-center flex-row flex-nowrap">
+    <header className={`flex gap-4 items-center flex-row flex-nowrap ${className}`}>
       <a href="/">
         <Image
           width={50}
