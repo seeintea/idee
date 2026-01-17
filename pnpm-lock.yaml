@@ -11,6 +11,9 @@ importers:
       codehike:
         specifier: ^1.0.7
         version: 1.0.7
+      crypto-aes-wasm:
+        specifier: ./shared/crypto-aes-wasm
+        version: link:shared/crypto-aes-wasm
       embla-carousel-react:
         specifier: ^8.6.0
         version: 8.6.0(react@19.2.3)

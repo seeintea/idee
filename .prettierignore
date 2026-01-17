@@ -1,3 +1,2 @@
 pnpm-lock.yaml
-eslint.config.mjs
-app/components/shadcn-ui/*
+shared/**/*
