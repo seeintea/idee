@@ -3,7 +3,8 @@ title: 2025 重启
 date: 2026.01.10
 ---
 
-import { EmblaCarousel } from "@/component/embla-carousel";
+import { EmblaCarousel } from "@/components/embla-carousel";
+import { Image } from "@/components/markdown";
 
 > 大概是想记住现在的自己吧，萌发了写年终总结的想法。25年对我而言应该是重启，从24年11月开始, 代入25年的视角，写下这些文字。
 
@@ -26,17 +27,23 @@ import { EmblaCarousel } from "@/component/embla-carousel";
 <EmblaCarousel
   className={"rounded-md"}
   render={[
-    "eoy_2025_06.webp",
-    "eoy_2025_01.webp",
-    "eoy_2025_02.webp",
-    "eoy_2025_03.webp",
-    "eoy_2025_04.webp",
-    "eoy_2025_05.webp",
-    "eoy_2025_07.webp",
-  ].map((item) => {
-    const imgUrl = `//seeintea.github.io/static/images/eoy/${item}`;
-    return <img src={imgUrl} alt={item} className="h-72 m-0!" />;
-  })}
+    ["eoy_2025_06.webp", "aspect-[4/3]"],
+    ["eoy_2025_01.webp", "aspect-[3/4]"],
+    ["eoy_2025_02.webp", "aspect-[3/4]"],
+    ["eoy_2025_03.webp", "aspect-[3/4]"],
+    ["eoy_2025_04.webp", "aspect-[3/4]"],
+    ["eoy_2025_05.webp", "aspect-[3/4]"],
+    ["eoy_2025_07.webp", "aspect-[4/3]"],
+  ].map(([filename, aspect]) => (
+    <Image
+      cdn
+      key={filename}
+      src={`/eoy/${filename}`}
+      container={`h-72 m-0! ${aspect}`}
+      className="m-0!"
+      alt={filename}
+    />
+  ))}
 />
 
 这段时间也尝试过找工作，但就业难度比我预想的要高。当自己的预期与现实一次次碰撞，我开始反思自己，我开始尝试改变。

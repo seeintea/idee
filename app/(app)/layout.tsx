@@ -1,5 +1,5 @@
-import { AppFooter } from "@/component/app-footer";
-import { AppHeader } from "@/component/app-header";
+import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
 
 export default function AppLayout({
   children,
@@ -7,10 +7,10 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className={"max-w-2xl mx-auto py-12 flex flex-col gap-8"}>
-      <AppHeader />
+    <main className={"max-w-lg mx-auto flex flex-col gap-8"}>
+      <Header />
       {children}
-      <AppFooter />
+      <Footer />
     </main>
   );
 }

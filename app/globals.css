@@ -6,30 +6,30 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
   --color-ring: var(--ring);
   --color-border: var(--border);
-
-  --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
-  --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(13% 0.028 261.692);
-
-  --border: color-mix(in oklab, oklch(13% 0.028 261.692), white 90%);
-  --ring: color-mix(in oklab, oklch(13% 0.028 261.692), white 90%);
-
-  --primary: oklch(13% 0.028 261.692);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(37.3% 0.034 259.733);
-  --secondary-foreground: oklch(70.7% 0.022 261.325);
+  --background: oklch(0.985 0.002 247.839);
+  --foreground: oklch(0.13 0.028 261.692);
+  --border: oklch(1 0 0 / 10%);
+  --ring: oklch(0.551 0.027 264.364);
+  --border: oklch(0.928 0.006 264.531);
+  --ring: oklch(0.707 0.022 261.325);
+  --primary: oklch(0.21 0.034 264.665);
+  --secondary: oklch(0.551 0.027 264.364);
 }
 
 .dark {
+  --background: oklch(0.13 0.028 261.692);
+  --foreground: oklch(0.985 0.002 247.839);
+  --border: oklch(1 0 0 / 10%);
+  --ring: oklch(0.551 0.027 264.364);
+  --primary: oklch(0.928 0.006 264.531);
+  --secondary: oklch(0.707 0.022 261.325);
 }
 
 @layer base {
@@ -40,6 +40,5 @@
 
   body {
     @apply bg-background text-primary;
-    font-family: "Source Han Serif CN VF";
   }
 }
