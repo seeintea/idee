@@ -2,6 +2,7 @@
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { type ComponentProps, type PropsWithChildren, useCallback, useEffect, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface EmblaCarouselProps {
   className?: string;
@@ -10,7 +11,7 @@ interface EmblaCarouselProps {
 
 type EmblaCarouselType = NonNullable<UseEmblaCarouselType[1]>;
 
-export function EmblaCarousel({ className = "", render }: EmblaCarouselProps) {
+export function EmblaCarousel({ className, render }: EmblaCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel();
 
   const [canScrollPrev, setCanScrollPrev] = useState<boolean>(false);
@@ -38,7 +39,7 @@ export function EmblaCarousel({ className = "", render }: EmblaCarouselProps) {
 
   return (
     <>
-      <div className={`overflow-hidden ${className}`} ref={emblaRef}>
+      <div className={twMerge("overflow-hidden", className)} ref={emblaRef}>
         <div className="flex">
           {render.map((item, idx) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: simple list
@@ -61,14 +62,16 @@ export function EmblaCarousel({ className = "", render }: EmblaCarouselProps) {
 }
 
 function EmblaCarouselButton(props: PropsWithChildren & ComponentProps<"button">) {
-  const { className = "", children, disabled = false, ...rest } = props;
-
-  const disabledClassName = disabled ? "opacity-50 cursor-not-allowed!" : "";
+  const { className, children, disabled = false, ...rest } = props;
 
   return (
     <button
       type="button"
-      className={`w-6 h-6 flex items-center justify-center border rounded cursor-pointer ${disabledClassName} ${className}`}
+      className={twMerge(
+        "w-6 h-6 flex items-center justify-center border rounded cursor-pointer",
+        disabled ? "opacity-50 cursor-not-allowed!" : "",
+        className,
+      )}
       {...rest}
     >
       {children}

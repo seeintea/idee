@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 
-import { AppHeader } from "@/component/app-header";
-import { components } from "@/component/mdx-components";
-import { TableOfContents } from "@/component/table-of-contents";
-import { documents } from "@/document";
+import { Header } from "@/components/header";
+import { components } from "@/components/markdown";
+import { TableOfContents } from "@/components/table-of-contents";
+import { documents } from "@/documents";
 
 export default async function Page({ params }: { params: Promise<{ slug: string[] }> }) {
   const next = await params;
@@ -14,8 +14,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
 
   return (
     <>
-      <div className={"max-w-2xl mx-auto py-12"}>
-        <AppHeader />
+      <div className={"max-w-2xl mx-auto pb-12"}>
+        <Header />
       </div>
       <div className="w-full grid auto-cols-max grid-flow-col justify-center gap-6">
         <div className={"hidden lg:block w-56"}></div>

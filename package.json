@@ -12,13 +12,13 @@
   },
   "dependencies": {
     "codehike": "^1.0.7",
+    "crypto-aes-wasm": "./shared/crypto-aes-wasm",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "sonner": "^2.0.7",
-    "crypto-aes-wasm": "./shared/crypto-aes-wasm"
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.10",

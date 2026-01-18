@@ -2,6 +2,12 @@ import content from "content";
 
 const { mdx } = content;
 
+const dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+};
+
 export const documents = mdx
   .map((document) => {
     const { file, default: MDXComponent, frontmatter, toc } = document;
@@ -16,6 +22,8 @@ export const documents = mdx
       for (const child of children || []) visit(child);
     };
     for (const node of toc) visit(node);
+
+    frontmatter.formatDate = new Date(frontmatter.date).toLocaleDateString("zh-CN", dateTimeFormatOptions);
 
     return {
       id,
