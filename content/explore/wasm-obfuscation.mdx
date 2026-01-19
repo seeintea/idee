@@ -21,7 +21,7 @@ const params = get();
 
 <Image
   cdn
-  container={"border rounded aspect-[3/1] overflow-hidden"}
+  container={"border rounded aspect-[3/1] overflow-hidden mt-6"}
   src="/explore/wasm-obfuscation-001.webp"
   alt="Wasm 加解密黑盒"
 />
@@ -30,8 +30,9 @@ const params = get();
 
 创建 WebAssembly 项目步骤就不再赘述，选定 Rust 作为重构语言。
 
-```rust
-// crypto_params.rs
+<CodeWithTabs>
+
+```rust !!tabs crypto_params.rs
 pub const KEY: [u8; 16] = [
     0x78, 0x73, 0x31, 0x30, 0x71, 0x6c, 0x6c, 0x77, 0x34, 0x46, 0x54, 0x63, 0x51, 0x38, 0x59, 0x55,
 ];
@@ -39,8 +40,9 @@ pub const KEY: [u8; 16] = [
 pub const IV: [u8; 16] = [
     0x6f, 0x6b, 0x75, 0x6b, 0x4a, 0x76, 0x56, 0x45, 0x38, 0x66, 0x48, 0x49, 0x58, 0x31, 0x4d, 0x79,
 ];
+```
 
-// lib.rs
+```rust !!tabs lib.rs
 #[wasm_bindgen]
 pub fn encrypt(plain_text: &str) -> String {
     let ct = aes128::encrypt_cbc(
@@ -51,14 +53,16 @@ pub fn encrypt(plain_text: &str) -> String {
     key_iv_codec::hex_encode(&ct)
 }
 
-pub fn decrypt(ciphertext_hex: &str) -> Result<String, JsValue> {
+pub fn decrypt(cipher_text_hex: &str) -> Result<String, JsValue> {
     let ct =
-        key_iv_codec::hex_decode(ciphertext_hex).map_err(|e| JsValue::from_str(&e.to_string()))?;
+        key_iv_codec::hex_decode(cipher_text_hex).map_err(|e| JsValue::from_str(&e.to_string()))?;
     let pt = aes128::decrypt_cbc(&crypto_params::KEY, &crypto_params::IV, &ct)
         .map_err(|e| JsValue::from_str(&e.to_string()))?;
     String::from_utf8(pt).map_err(|_| JsValue::from_str("invalid utf-8 plaintext"))
 }
 ```
+
+</CodeWithTabs>
 
 重构思路如下
 

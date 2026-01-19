@@ -12,7 +12,7 @@ import { findAllMDXFile, ensureDir, getMDXCompiledPath, generateExportFile } fro
 
 /** @typedef {import('codehike/mdx').CodeHikeConfig} CodeHikeConfig */
 const chConfig = {
-  components: { code: "Code" },
+  components: { code: "Code", codeWithTabs: "CodeWithTabs" },
 };
 
 /**
