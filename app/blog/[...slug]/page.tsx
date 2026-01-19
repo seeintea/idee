@@ -1,30 +1,31 @@
 import { notFound } from "next/navigation";
+import { twMerge } from "tailwind-merge";
 
 import { Header } from "@/components/header";
 import { components } from "@/components/markdown";
+import { MDXTitle } from "@/components/mdx-title";
 import { TableOfContents } from "@/components/table-of-contents";
 import { documents } from "@/documents";
+
+const PROSE_CLASSNAME = "prose dark:prose-invert prose-blockquote:not-italic";
 
 export default async function Page({ params }: { params: Promise<{ slug: string[] }> }) {
   const next = await params;
   const document = documents.find((document) => document.slug.join("/") === next.slug.join("/"));
   if (!document) notFound();
-
-  const { MDXComponent, toc } = document;
-
+  const { MDXComponent, toc, meta } = document;
   return (
     <>
-      <div className={"max-w-2xl mx-auto pb-12"}>
-        <Header />
-      </div>
-      <div className="w-full grid auto-cols-max grid-flow-col justify-center gap-6">
-        <div className={"hidden lg:block w-56"}></div>
-
-        <article id="mdx-article" className="prose prose-zinc px-6 md:px-0 max-w-2xl">
+      <Header className={"max-w-main mx-auto pb-12"} />
+      <div className="w-full grid grid-cols-1 justify-center gap-6 xl:grid-cols-[14rem_auto_14rem]">
+        <article
+          id="mdx-article"
+          className={twMerge("px-4 md:px-0 max-w-content mx-auto xl:col-start-2", PROSE_CLASSNAME)}
+        >
+          <MDXTitle title={meta.title} date={meta.formatDate} />
           <MDXComponent components={components} />
         </article>
-
-        <aside className="hidden lg:block w-56">
+        <aside className="hidden xl:block w-56 xl:col-start-3">
           <div className="fixed">
             <TableOfContents items={toc} rootId="mdx-article" />
           </div>

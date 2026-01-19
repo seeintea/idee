@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { compile } from "@mdx-js/mdx";
-import remarkHeadingId from "remark-heading-id";
 import rehypeSlug from "rehype-slug";
+import { remarkHeadingId } from "remark-custom-heading-id";
 import { remarkMdxToc } from "remark-mdx-toc";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
