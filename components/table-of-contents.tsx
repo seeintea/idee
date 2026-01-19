@@ -87,36 +87,34 @@ export function TableOfContents({ items, rootId, className = "", offsetTop = 96 
   }, [rootId, offsetTop, orderedIds]);
 
   const body = (() => {
-    if (items.length > 0) {
-      return (
-        <ul className="space-y-2 text-sm">
-          {items.map((toc, idx) => {
-            const id = orderedIds[idx] || "";
-            const isActive = id ? activeIds.has(id) : false;
-            return (
-              <li key={`${id}-${toc.depth}`} className={toc.depth === 3 ? "pl-4" : ""}>
-                <a
-                  href={id ? `#${id}` : undefined}
-                  aria-current={isActive ? "true" : undefined}
-                  className={
-                    isActive ? "text-zinc-900 font-medium" : "text-zinc-400 hover:text-zinc-900 transition-colors"
-                  }
-                >
-                  {toc.value}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      );
-    }
-
-    return <div className="text-sm text-zinc-400">暂无目录</div>;
+    return (
+      <ul className="space-y-2 text-sm">
+        {items.map((toc, idx) => {
+          const id = orderedIds[idx] || "";
+          const isActive = id ? activeIds.has(id) : false;
+          return (
+            <li key={`${id}-${toc.depth}`} className={toc.depth === 3 ? "pl-4" : ""}>
+              <a
+                href={id ? `#${id}` : undefined}
+                aria-current={isActive ? "true" : undefined}
+                className={
+                  isActive ? "text-primary font-medium" : "text-secondary hover:text-primary transition-colors"
+                }
+              >
+                {toc.value}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    );
   })();
+
+  if (items.length === 0) return null;
 
   return (
     <nav className={className}>
-      <div className="text-sm font-medium mb-3">目录</div>
+      <div className="text-sm font-medium mb-3 text-secondary">目录</div>
       {body}
     </nav>
   );

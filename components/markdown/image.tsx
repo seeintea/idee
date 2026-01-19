@@ -12,7 +12,7 @@ export function Image({ container, cdn, src, ...rest }: ImageProps) {
   const imageUrl = cdn ? `${cdnPrefix}${src}` : src;
 
   return (
-    <div className={twMerge("relative", "aspect-square", container)}>
+    <div className={twMerge("relative not-prose", "aspect-square", container)}>
       <NextImage
         {...rest}
         src={imageUrl}

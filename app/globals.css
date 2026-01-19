@@ -10,6 +10,10 @@
   --color-border: var(--border);
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
+
+  --spacing-main: var(--container-xl);
+  --spacing-content: var(--container-2xl);
+  --font-ioskeley: "Ioskeley Mono", monospace;
 }
 
 :root {
@@ -40,5 +44,10 @@
 
   body {
     @apply bg-background text-primary;
+  }
+
+  @font-face {
+    font-family: "Ioskeley Mono";
+    src: url("/ioskeley-mono.woff2");
   }
 }

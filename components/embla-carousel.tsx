@@ -38,7 +38,7 @@ export function EmblaCarousel({ className, render }: EmblaCarouselProps) {
   }, [emblaApi, onSelect]);
 
   return (
-    <>
+    <div className="not-prose">
       <div className={twMerge("overflow-hidden", className)} ref={emblaRef}>
         <div className="flex">
           {render.map((item, idx) => (
@@ -57,7 +57,7 @@ export function EmblaCarousel({ className, render }: EmblaCarouselProps) {
           <ArrowRight size={18} />
         </EmblaCarouselButton>
       </div>
-    </>
+    </div>
   );
 }
 
