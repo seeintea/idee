@@ -8,9 +8,16 @@ const dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
   day: "numeric",
 };
 
+const lastModifiedFormatOptions: Intl.DateTimeFormatOptions = {
+  ...dateTimeFormatOptions,
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+};
+
 export const documents = mdx
   .map((document) => {
-    const { file, default: MDXComponent, frontmatter, toc } = document;
+    const { file, default: MDXComponent, frontmatter, toc, lastModified } = document;
     const match = /^\/content(.+)\.mdx$/u.exec(file);
     const id = match ? match[1] : file;
     const slug = id.split("/").slice(1);
@@ -24,7 +31,9 @@ export const documents = mdx
     for (const node of toc) visit(node);
 
     frontmatter.formatDate = new Date(frontmatter.date).toLocaleDateString("zh-CN", dateTimeFormatOptions);
-
+    if (lastModified) {
+      frontmatter.lastModified = new Date(lastModified).toLocaleDateString("zh-CN", lastModifiedFormatOptions);
+    }
     return {
       id,
       toc: flatToc,

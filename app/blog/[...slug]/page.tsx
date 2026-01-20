@@ -6,6 +6,7 @@ import { components } from "@/components/markdown";
 import { MDXTitle } from "@/components/mdx-title";
 import { TableOfContents } from "@/components/table-of-contents";
 import { documents } from "@/documents";
+import { MDXEnd } from "@/components/mdx-end";
 
 const PROSE_CLASSNAME = "prose dark:prose-invert prose-blockquote:not-italic";
 
@@ -24,6 +25,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
         >
           <MDXTitle title={meta.title} date={meta.formatDate} />
           <MDXComponent components={components} />
+          <MDXEnd lastModified={meta.lastModified} />
         </article>
         <aside className="hidden xl:block w-56 xl:col-start-3">
           <div className="fixed">
