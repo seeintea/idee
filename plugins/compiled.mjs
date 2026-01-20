@@ -8,6 +8,8 @@ import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { recmaCodeHike, remarkCodeHike } from "codehike/mdx";
 
+import { lastModified } from "./last-modified.mjs";
+
 import { findAllMDXFile, ensureDir, getMDXCompiledPath, generateExportFile } from "./utils.mjs";
 
 /** @typedef {import('codehike/mdx').CodeHikeConfig} CodeHikeConfig */
@@ -36,9 +38,10 @@ export async function compiled(content) {
  */
 export async function compiledSingleMDXFile(mdxPath, distPath) {
   const content = await fs.readFile(mdxPath, "utf8");
-  const code = await compiled(content);
+  let code = await compiled(content);
   await ensureDir(distPath);
   const compiledPath = getMDXCompiledPath(mdxPath, distPath);
+  code = await lastModified(mdxPath, code);
   await fs.writeFile(compiledPath, String(code), "utf8");
   return { mdx: mdxPath, js: compiledPath };
 }
