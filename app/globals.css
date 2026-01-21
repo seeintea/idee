@@ -10,10 +10,11 @@
   --color-border: var(--border);
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
-
   --spacing-main: var(--container-xl);
   --spacing-content: var(--container-2xl);
   --font-ioskeley: "Ioskeley Mono", monospace;
+  --color-warn: var(--color-yellow-400);
+  --color-danger: var(--color-red-700);
 }
 
 :root {
@@ -49,5 +50,30 @@
   @font-face {
     font-family: "Ioskeley Mono";
     src: url("/ioskeley-mono.woff2");
+  }
+
+  .idee-alert {
+    color: var(--tw-prose-quotes);
+    border-inline-start-width: 0.25rem;
+    border-inline-start-color: var(--tw-prose-quote-borders);
+    margin-top: 1.6em;
+    margin-bottom: 1.6em;
+    padding-inline-start: 1em;
+    @apply font-medium;
+
+    .idee-alert-content::before {
+      content: open-quote;
+    }
+
+    .idee-alert-content::after {
+      content: close-quote;
+    }
+  }
+
+  .idee-alert-warn {
+    border-inline-start-color: var(--color-warn);
+  }
+  .idee-alert-danger {
+    border-inline-start-color: var(--color-danger);
   }
 }

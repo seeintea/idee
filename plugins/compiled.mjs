@@ -8,6 +8,7 @@ import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { recmaCodeHike, remarkCodeHike } from "codehike/mdx";
 
+import remarkGithubAlerts from "./remark-github-alerts.mjs";
 import { lastModified } from "./last-modified.mjs";
 
 import { findAllMDXFile, ensureDir, getMDXCompiledPath, generateExportFile } from "./utils.mjs";
@@ -25,7 +26,14 @@ const chConfig = {
 export async function compiled(content) {
   const code = await compile(content, {
     rehypePlugins: [rehypeSlug],
-    remarkPlugins: [remarkHeadingId, remarkMdxToc, remarkFrontmatter, remarkMdxFrontmatter, [remarkCodeHike, chConfig]],
+    remarkPlugins: [
+      remarkHeadingId,
+      remarkMdxToc,
+      remarkFrontmatter,
+      remarkMdxFrontmatter,
+      [remarkCodeHike, chConfig],
+      remarkGithubAlerts,
+    ],
     recmaPlugins: [[recmaCodeHike, chConfig]],
   });
   return code;
