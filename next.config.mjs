@@ -25,8 +25,7 @@ const withMDX = createMDX({
   dir: "content",
   output: ".content",
   logger: false,
-  // only dev
-  // ignore: true,
+  ignore: `${process.env.UI_MODE}` === "true", // for ui dev
 });
 
 export default withMDX(nextConfig);
