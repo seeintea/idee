@@ -78,6 +78,7 @@ export function AesPerformance() {
   const [plaintextSizeBytes, setPlaintextSizeBytes] = useState(1024);
   const [iterations, setIterations] = useState(2000);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [validSameHex, setValidSameHex] = useState<string | null>(null);
   const [controlsState, setControlsState] = useState<ControlsState>("initializing");
   const webCryptoAesKeyRef = useRef<CryptoKey | null>(null);
 
@@ -131,7 +132,9 @@ export function AesPerformance() {
     if (wasmHex !== webHex) {
       setErrorMessage("不一致（如果浏览器 AES-CBC padding 实现不同，可能会出现）");
     } else {
-      setErrorMessage(`校验一致 -> asmHex: ${wasmHex.slice(0, 32)}... webHex: ${webHex.slice(0, 32)}...`);
+      setValidSameHex(`校验一致
+asmHex: ${wasmHex.slice(0, 64)}...
+webHex: ${webHex.slice(0, 64)}...`);
     }
   }, [controlsState, plaintext]);
 
@@ -227,17 +230,13 @@ export function AesPerformance() {
   }, [controlsState, iterations, plaintext]);
 
   return (
-    <section className="space-y-4">
-      <div className="text-sm text-zinc-500">
-        对比：WASM（AES-128-CBC + PKCS#7，输出 hex） vs WebCrypto（AES-CBC，输出 hex）。
-      </div>
-
+    <section>
       <div className="space-y-3">
         <div className="flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1 text-sm">
             明文大小（字节）
             <input
-              className="border rounded px-2 py-1 w-44"
+              className="border rounded px-2 py-1 w-22 h-8"
               type="number"
               min={1}
               step={1}
@@ -248,7 +247,7 @@ export function AesPerformance() {
           <label className="flex flex-col gap-1 text-sm">
             循环次数
             <input
-              className="border rounded px-2 py-1 w-44"
+              className="border rounded px-2 py-1 w-22 h-8"
               type="number"
               min={1}
               step={1}
@@ -256,11 +255,9 @@ export function AesPerformance() {
               onChange={(e) => setIterations(Number(e.target.value))}
             />
           </label>
-        </div>
-        <div className="flex flex-wrap items-end gap-3">
           <button
             type="button"
-            className="border rounded px-2 py-0.5 cursor-pointer"
+            className="border rounded px-2 py-0.5 cursor-pointer h-8"
             onClick={handleRunBenchmark}
             disabled={controlsState !== "ready"}
           >
@@ -268,7 +265,7 @@ export function AesPerformance() {
           </button>
           <button
             type="button"
-            className="border rounded px-2 py-0.5 cursor-pointer"
+            className="border rounded px-2 py-0.5 cursor-pointer h-8"
             onClick={handleVerify}
             disabled={controlsState !== "ready"}
           >
@@ -276,13 +273,12 @@ export function AesPerformance() {
           </button>
         </div>
       </div>
-
-      {errorMessage ? <div className="text-sm text-red-600">{errorMessage}</div> : null}
-
-      <div className="overflow-auto">
-        <table className="border-collapse mt-0!">
+      {errorMessage ? <div className="text-sm text-red-600 mt-6">{errorMessage}</div> : null}
+      {validSameHex ? <div className="text-sm mt-6 whitespace-pre-line">{validSameHex}</div> : null}
+      <div className="overflow-auto mt-6">
+        <table className="border-collapse m-0!">
           <thead>
-            <tr className="bg-zinc-50">
+            <tr>
               <th className="border px-2 py-2 text-left text-sm">项目</th>
               <th className="border px-2 py-2 text-left text-sm">耗时（ms）</th>
               <th className="border px-2 py-2 text-left text-sm">吞吐（MiB/s）</th>
