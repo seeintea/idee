@@ -273,8 +273,8 @@ webHex: ${webHex.slice(0, 64)}...`);
           </button>
         </div>
       </div>
-      {errorMessage ? <div className="text-sm text-red-600 mt-6">{errorMessage}</div> : null}
-      {validSameHex ? <div className="text-sm mt-6 whitespace-pre-line">{validSameHex}</div> : null}
+      {errorMessage ? <div className="text-sm text-red-600 mt-6 overflow-hidden">{errorMessage}</div> : null}
+      {validSameHex ? <div className="text-sm mt-6 whitespace-pre-line overflow-hidden">{validSameHex}</div> : null}
       <div className="overflow-auto mt-6">
         <table className="border-collapse m-0!">
           <thead>
