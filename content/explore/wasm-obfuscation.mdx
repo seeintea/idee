@@ -6,9 +6,7 @@ date: 2026.01.17
 import { AesPerformance } from "@/components/content";
 import { Image } from "@/components/markdown";
 
-最近在定位线上问题时，在打包后的代码中发现一串连续的字符，在全局搜索后，发现是用来处理数据加解密的密钥。对于开发者而言，前端代码是透明的，但是直接将密钥硬编码在代码中，很明显是不合适的。常见的做法是将这部分加解密代码做混淆，增加逆向难度。
-
-经过混淆后的代码，可读性会大幅度下降，但是在浏览器中仍可能通过调试的方式去获取原始密钥。最根本原因是密钥硬编码在代码中，没有服务端的支持，前端能做的只是尽可能提高逆向的难度和成本。
+最近在定位线上问题时，我在打包产物里发现了一段连续字符。全局搜索后确认它是用于数据加解密的密钥。前端代码天然透明，把密钥硬编码进代码里显然不合适。常见的补救手段是对加解密逻辑做混淆，以提高逆向成本。
 
 ```js
 const AES_KEY = "xs10qllw4FTcQ8YUrM56triR4Ds4NrmB";
@@ -19,20 +17,24 @@ const get = () => {
 const params = get();
 ```
 
+将这段示例代码混淆后，可读性会大幅下降，代码里会充斥着诸如 `0x13db5c` 之类的常量与变量。但在浏览器里仍可能通过调试拿到 `AES_KEY` 与 `AES_IV` 的真实值。根因在于密钥写死在前端：在缺少服务端参与的前提下，前端能做到的通常只是“增加难度”，而不是“彻底隐藏”。
+
 <Image
   cdn
-  container={"border rounded aspect-[3/1] overflow-hidden mt-6"}
+  container={"border rounded aspect-[3/1] overflow-hidden mt-4"}
   src="/explore/wasm-obfuscation-001.webp"
   alt="Wasm 加解密黑盒"
 />
 
-在代码执行过程中，始终会去计算出密钥用于加解密，如果可以构建一个黑盒，隐藏这一过程，就可以很好的解决这个问题。但是正如上述，前端代码是透明的，构建一个黑盒很明显是不可能的。调研近年流行技术发现，WebAssembly 可以提供一种近乎黑盒实现。将加解密的方法使用 Go/Rust 等语言重构，打包成 wasm 文件供前端调用，对于分析打包后代码或调试获取密钥有很明显的收益。
+在运行时，密钥必然会以某种形式出现在执行路径上（哪怕是被拆分、拼接、解码后再使用）。如果能把“密钥如何被构造出来”的过程放进一个黑盒里，至少可以显著降低被直接定位/提取的概率。但如前所述，前端代码透明，严格意义上的黑盒并不存在。
 
-创建 WebAssembly 项目步骤就不再赘述，选定 Rust 作为重构语言。
+一个更现实的方向是：把关键逻辑迁移到 WebAssembly 中，获得一种“近似黑盒”的效果。把加解密实现用 Go/Rust 等语言重写并编译为 wasm 文件，再由前端调用，这对分析打包后的 JS、以及通过调试直接定位密钥，都有一定的对抗收益。
+
+创建 WebAssembly 项目的步骤这里不展开；我选择 Rust 作为重构语言。
 
 <CodeWithTabs>
 
-```rust !!tabs crypto_params.rs
+```rust !!tabs crypto-aes-wasm/src/crypto_params.rs
 pub const KEY: [u8; 16] = [
     0x78, 0x73, 0x31, 0x30, 0x71, 0x6c, 0x6c, 0x77, 0x34, 0x46, 0x54, 0x63, 0x51, 0x38, 0x59, 0x55,
 ];
@@ -42,7 +44,7 @@ pub const IV: [u8; 16] = [
 ];
 ```
 
-```rust !!tabs lib.rs
+```rust !!tabs crypto-aes-wasm/src/lib.rs
 #[wasm_bindgen]
 pub fn encrypt(plain_text: &str) -> String {
     let ct = aes128::encrypt_cbc(
@@ -64,17 +66,46 @@ pub fn decrypt(cipher_text_hex: &str) -> Result<String, JsValue> {
 
 </CodeWithTabs>
 
-重构思路如下
+重构思路大致如下：
 
-- 将原先的 AES_KEY/AES_IV 转换为 16 位 hex 数组，不在以明文的形式存在（此步骤在 js 中也可以实现）
-- 对外输出 encrypt/decrypt 两个方法用于加解密（仅字符串接口，减少交互开销）
+- 将原先的 `AES_KEY` / `AES_IV` 转换为 16 字节数组，避免以明文字符串形式直接出现在 JS（这个步骤在 JS 里也能做，但放在 Rust 更利于统一封装）
+- 封装 AES-128 CBC 的加解密与 `hex_decode` / `hex_encode` 等必要的编解码工具
+- 对外仅暴露 `encrypt` / `decrypt` 两个函数（用字符串接口，尽量降低 JS 与 wasm 的交互复杂度）
 
-> 花了较多时间尝试从 wasm 中寻找 KEY/IV 的相关数据，未果。
-
-最后是对性能开销的评估，从测试结果来看，使用 wasm 方案可能很好替代原先的 js 方案。
+引入 wasm 后，简单验证如下：
 
 <AesPerformance />
 
-> [!warn] 注意这是警告信息哈哈哈哈哈
+将编译后的 wasm 转换为 wat 格式后，可以尝试直接在文本中检索密钥。你会发现转换后的代码呈现出一种类似 `LISP` 的结构化风格：符号密集、片段离散，想从中快速定位“散落的密钥”会难很多。
 
-> [!danger] hhhhhhhh 测试数据
+```wasm
+(module
+  (type $t0 (func (param i32 i32)))
+  (type $t1 (func (param i32 i32) (result i32)))
+  (type $t2 (func (param i32 i32 i32) (result i32)))
+  (type $t3 (func (param i32)))
+  (type $t4 (func (param i32 i32 i32)))
+  (type $t5 (func (param i32 i32 i32 i32) (result i32)))
+  (type $t6 (func (result i32 i32 i32 i32)))
+  (type $t7 (func (result i32 i32)))
+  (type $t8 (func))
+  (type $t9 (func (param i32 i32) (result externref)))
+  (type $t10 (func (param i32) (result i32)))
+  (type $t11 (func (param i32 i32 i32 i32 i32)))
+  (type $t12 (func (param i32 i32 i32 i32 i32 i32)))
+  (type $t13 (func (param i32 i32) (result i32 i32 i32 i32)))
+  (type $t14 (func (param i32 i32) (result i32 i32)))
+  (import "./crypto_aes_wasm_bg.js" "__wbindgen_init_externref_table" (func $./crypto_aes_wasm_bg.js.__wbindgen_init_externref_table (type $t8)))
+  (import "./crypto_aes_wasm_bg.js" "__wbindgen_cast_0000000000000001" (func $./crypto_aes_wasm_bg.js.__wbindgen_cast_0000000000000001 (type $t9)))
+  (func $f2 (type $t10) (param $p0 i32) (result i32)
+    (local $l1 i32) (local $l2 i32) (local $l3 i32) (local $l4 i32) (local $l5 i32) (local $l6 i32) (local $l7 i32) (local $l8 i32) (local $l9 i32) (local $l10 i64)
+    (global.set $g0
+      (local.tee $l8
+        (i32.sub
+          (global.get $g0)
+          (i32.const 16))))
+    (block $B0
+  // ...more
+```
+
+需要强调的是：把密钥“藏进 wasm”并不意味着密钥真正安全。只要攻击者能在前端调用 `encrypt` / `decrypt`，就仍然可以把它当作一个加解密 Oracle 来使用，最终的效果更多是“提高提取密钥的门槛”，而非“阻止功能被滥用”。要从根本上解决密钥暴露问题，仍需要服务端参与（例如密钥不下发、按会话派生、请求签名等）。

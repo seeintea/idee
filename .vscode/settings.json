@@ -2,9 +2,9 @@
   "cSpell.words": ["IDÉE", "idee", "embla", "codehike", "recma", "rslog", "frontmatter", "ioskeley", "tinyexec"],
   "editor.formatOnSave": true,
   "[typescript]": {
-    "editor.defaultFormatter": "prettier.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "[typescriptreact]": { "editor.defaultFormatter": "prettier.prettier-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
   "editor.codeActionsOnSave": {
     "source.organizeImports.biome": "explicit"
   }
