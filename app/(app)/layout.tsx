@@ -7,7 +7,7 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className={"max-w-main mx-auto flex flex-col gap-8"}>
+    <main className={"px-4 md:0 md:max-w-main mx-auto flex flex-col gap-8"}>
       <Header />
       {children}
       <Footer />
