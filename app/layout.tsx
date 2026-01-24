@@ -4,6 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "IDÉE",
+  description: "My personal website.",
 };
 
 export default function RootLayout({

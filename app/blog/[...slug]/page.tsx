@@ -23,7 +23,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
           id="mdx-article"
           className={twMerge("px-4 md:px-0 w-full md:max-w-content mx-auto xl:col-start-2", PROSE_CLASSNAME)}
         >
-          <MDXTitle title={meta.title} date={meta.formatDate} />
+          <MDXTitle title={meta.title} date={meta.formatDate} tags={(meta.tags as unknown as string[]) || []} />
           <MDXComponent components={components} />
           <MDXEnd lastModified={meta.lastModified} />
         </article>
@@ -41,4 +41,22 @@ export function generateStaticParams() {
   return documents.map((document) => ({
     slug: document.slug,
   }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string[] }> }) {
+  const next = await params;
+  const document = documents.find((document) => document.slug.join("/") === next.slug.join("/"));
+  if (!document) notFound();
+
+  const { title, description, lastModified } = document.meta;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: "article",
+      authors: "leviegu",
+      modifiedTime: lastModified,
+    },
+  };
 }

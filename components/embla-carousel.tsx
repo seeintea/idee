@@ -50,10 +50,10 @@ export function EmblaCarousel({ className, render }: EmblaCarouselProps) {
         </div>
       </div>
       <div className={"mt-3 mr-1 flex items-center justify-end gap-2"}>
-        <EmblaCarouselButton onClick={handleScrollPrev} disabled={!canScrollPrev}>
+        <EmblaCarouselButton onClick={handleScrollPrev} disabled={!canScrollPrev} aria-label={"previous slide"}>
           <ArrowLeft size={18} />
         </EmblaCarouselButton>
-        <EmblaCarouselButton onClick={handleScrollNext} disabled={!canScrollNext}>
+        <EmblaCarouselButton onClick={handleScrollNext} disabled={!canScrollNext} aria-label={"next slide"}>
           <ArrowRight size={18} />
         </EmblaCarouselButton>
       </div>

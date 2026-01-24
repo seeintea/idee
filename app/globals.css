@@ -50,6 +50,7 @@
   @font-face {
     font-family: "Ioskeley Mono";
     src: url("/ioskeley-mono.woff2");
+    display: swap;
   }
 
   .idee-alert {
