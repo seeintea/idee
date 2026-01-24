@@ -77,7 +77,9 @@ export async function startWorker(options) {
  */
 export async function createMdxServer(options) {
   if (options.command === "build") {
+    const startBuild = performance.now();
     await compiledAllMDXFile(options.dirPath, options.outputPath);
+    logger.success(`build all mdx files in ${(performance.now() - startBuild).toFixed(2)}ms`);
     return null;
   }
   return startWorker(options);
