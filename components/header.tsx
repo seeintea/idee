@@ -1,5 +1,6 @@
 import { AtSign } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 
 import { ThemeToggler } from "./theme-toggler";
@@ -7,9 +8,9 @@ import { ThemeToggler } from "./theme-toggler";
 export function Header({ className }: { className?: string }) {
   return (
     <header className={twMerge("flex gap-4 items-center flex-row flex-nowrap", className)}>
-      <a href="/">
-        <Image width={50} height={50} className="rounded-4xl" src="/avatar.webp" alt="avatar" loading="eager" />
-      </a>
+      <Link href="/">
+        <Image width={50} height={50} className="rounded-4xl" src="/avatar.webp" alt="avatar" priority />
+      </Link>
       <div className="flex-1">
         <p className="font-bold text-lg">leviegu</p>
         <div className="flex gap-2.5 text-sm text-secondary items-center">

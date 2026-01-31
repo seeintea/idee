@@ -8,16 +8,24 @@ import { MDXTitle } from "@/components/mdx-title";
 import { TableOfContents } from "@/components/table-of-contents";
 import { documents } from "@/documents";
 
+export const dynamicParams = false;
+
 const PROSE_CLASSNAME = "prose dark:prose-invert prose-blockquote:not-italic";
 
-export default async function Page({ params }: { params: Promise<{ slug: string[] }> }) {
+type PageProps = { params: Promise<{ slug: string[] }> | { slug: string[] } };
+
+function getDocumentBySlug(slug: string[]) {
+  return documents.find((document) => document.slug.join("/") === slug.join("/"));
+}
+
+export default async function Page({ params }: PageProps) {
   const next = await params;
-  const document = documents.find((document) => document.slug.join("/") === next.slug.join("/"));
+  const document = getDocumentBySlug(next.slug);
   if (!document) notFound();
   const { MDXComponent, toc, meta } = document;
   return (
     <>
-      <Header className={"px-4 md:0 md:max-w-main mx-auto pb-12"} />
+      <Header className={"px-4 md:px-0 md:max-w-main mx-auto pb-12"} />
       <div className="w-full grid grid-cols-1 justify-center gap-6 xl:grid-cols-[14rem_auto_14rem]">
         <article
           id="mdx-article"
@@ -43,9 +51,9 @@ export function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string[] }> }) {
+export async function generateMetadata({ params }: PageProps) {
   const next = await params;
-  const document = documents.find((document) => document.slug.join("/") === next.slug.join("/"));
+  const document = getDocumentBySlug(next.slug);
   if (!document) notFound();
 
   const { title, description, lastModified } = document.meta;

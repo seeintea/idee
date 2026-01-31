@@ -1,4 +1,3 @@
-"use client";
 import { twMerge } from "tailwind-merge";
 
 export function Footer({ className }: { className?: string }) {
