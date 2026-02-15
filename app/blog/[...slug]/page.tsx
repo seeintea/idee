@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { twMerge } from "tailwind-merge";
 
 import { Header } from "@/components/header";
@@ -14,6 +16,12 @@ const PROSE_CLASSNAME = "prose dark:prose-invert prose-blockquote:not-italic";
 
 type PageProps = { params: Promise<{ slug: string[] }> | { slug: string[] } };
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
+  : process.env.VERCEL_URL
+    ? new URL(`https://${process.env.VERCEL_URL}`)
+    : new URL("http://localhost:3000");
+
 function getDocumentBySlug(slug: string[]) {
   return documents.find((document) => document.slug.join("/") === slug.join("/"));
 }
@@ -23,8 +31,24 @@ export default async function Page({ params }: PageProps) {
   const document = getDocumentBySlug(next.slug);
   if (!document) notFound();
   const { MDXComponent, toc, meta } = document;
+  const canonicalPath = `/blog/${document.slug.join("/")}`;
+  const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: meta.title,
+    ...(meta.description ? { description: meta.description } : {}),
+    datePublished: new Date(meta.date).toISOString(),
+    ...(meta.lastModifiedISO ? { dateModified: meta.lastModifiedISO } : {}),
+    author: { "@type": "Person", name: "leviegu", url: "https://github.com/seeintea" },
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+    url: canonicalUrl,
+  };
   return (
     <>
+      <Script id={`ld-blog-${document.slug.join("-")}`} type="application/ld+json">
+        {JSON.stringify(jsonLd)}
+      </Script>
       <Header className={"px-4 md:px-0 md:max-w-main mx-auto pb-12"} />
       <div className="w-full grid grid-cols-1 justify-center gap-6 xl:grid-cols-[14rem_auto_14rem]">
         <article
@@ -51,20 +75,39 @@ export function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const next = await params;
   const document = getDocumentBySlug(next.slug);
   if (!document) notFound();
 
-  const { title, description, lastModified } = document.meta;
+  const canonical = `/blog/${document.slug.join("/")}`;
+  const { title, description, lastModifiedISO, date } = document.meta;
+  const tags = Array.isArray(document.meta.tags) ? document.meta.tags : [];
+  const publishedTime = new Date(date).toISOString();
+  const modifiedTime = lastModifiedISO || publishedTime;
 
   return {
     title,
     description,
     openGraph: {
       type: "article",
-      authors: "leviegu",
-      modifiedTime: lastModified,
+      url: canonical,
+      title,
+      description,
+      authors: ["leviegu"],
+      publishedTime,
+      modifiedTime,
+      tags: tags.length ? tags : undefined,
     },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      creator: "@levie_gu",
+    },
+    alternates: {
+      canonical,
+    },
+    keywords: tags.length ? tags : undefined,
   };
 }

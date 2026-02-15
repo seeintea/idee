@@ -32,6 +32,7 @@ export const documents = mdx
 
     frontmatter.formatDate = new Date(frontmatter.date).toLocaleDateString("zh-CN", dateTimeFormatOptions);
     if (lastModified) {
+      frontmatter.lastModifiedISO = new Date(lastModified).toISOString();
       frontmatter.lastModified = new Date(lastModified).toLocaleDateString("zh-CN", lastModifiedFormatOptions);
     }
     return {

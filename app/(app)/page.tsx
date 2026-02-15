@@ -1,6 +1,24 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { documents } from "@/documents";
+
+export const metadata: Metadata = {
+  title: "Blog",
+  description: "Posts and notes by leviegu.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    url: "/",
+    title: "IDÉE",
+    description: "Posts and notes by leviegu.",
+  },
+  twitter: {
+    card: "summary",
+    title: "IDÉE",
+    description: "Posts and notes by leviegu.",
+    creator: "@levie_gu",
+  },
+};
 
 export default function Index() {
   return (

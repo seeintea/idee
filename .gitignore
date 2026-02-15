@@ -42,3 +42,7 @@ next-env.d.ts
 
 # content
 **/.content/**/*
+
+# vibe coding
+.agents/**/*
+.trae/**/*
