@@ -1,0 +1,61 @@
+---
+title: React SPA 项目路由架构实践（2026）【草稿】
+date: 2026-04-17
+description: 从 TanStack Router 到 React Router v7，探索现代 React SPA 的路由架构最佳实践
+tags: ["React", "路由", "架构"]
+---
+
+2026 年，我开始搭建一个新的 React SPA 项目。背景是老项目使用 React Router v6，维护到后期路由文件长达数千行，多个 feature 并行开发时极易造成 Git 冲突。
+
+新项目依然选择 React 作为基础框架，但我希望从架构层面彻底解决这个问题。
+
+## TanStack Router 初探
+
+TanStack Router 是近年兴起的 React 路由方案，以类型安全和文件路由著称。
+
+一开始一切顺利，直到处理前置路由鉴权和跳转时遇到了问题：
+
+1. 在 `__root.tsx` 中编写 loader，处理用户 token、权限数据和路由跳转
+2. 配置了 `pendingComponent` 和 `pendingMs`
+3. 测试时页面直接白屏
+
+这是一个已知的重构导致的 bug（[TanStack/router#7120](https://github.com/TanStack/router/issues/7120)）。考虑到新框架的稳定性风险，我决定转向久经考验的 React Router。
+
+## React Router v7 框架模式
+
+React Router v7 的框架模式将原先 Remix 的理念融入其中。
+
+但很快就遇到了问题：
+
+**问题 1：不支持嵌套文件夹路由**
+
+- 被迫调整为扁平路由结构
+- 主要痛点：扁平路由的布局需要用前缀约定。比如授权相关的布局是 `_auth.tsx`，那么所有使用该布局的路由都要加 `_auth` 前缀
+- 解决方案：在根路由设置全局布局，利用 `@react-router/fs-routes` 生成路由数据后，重新组装并通过 layout 函数注入布局组件
+
+**问题 2：菜单生成需要获取所有路由**
+
+- 框架提供了相关 unsafe 接口，但不想使用
+- 解决方案：自定义插件扫描 routes 文件夹，读取 handle 配置并按约定生成路由文件
+
+但最终让我放弃的是打包产物问题。
+
+我的项目思路是：`routes/*` 只存放路由配置，具体业务逻辑在 `features/*` 下开发。这样设计是因为老项目中有先例——不同路由可能复用同一个页面组件，只是调用接口时多传一个 type 参数。
+
+然而打包后发现，React Router 强行将 `routes/xxx.tsx` 和 `features/xxx.tsx` 拆分成两个文件，导致产物过于零碎。暂时没找到很好的整合方案，只好放弃。
+
+## React Router v7 库模式
+
+最终回归到 React Router 库模式，但融合了 TanStack Router 和框架模式的思路。
+
+核心方案：**`routes/*` 管理路由配置，`features/*` 存放业务组件**
+
+以权限管理为例，可能有「权限列表」和「权限分配」两个子路由。我在 `routes` 下创建 `permission.tsx`，导出权限模块的全部路由数据。这样后续多个 feature 涉及权限模块时，冲突只会局限在这个文件夹内。
+
+然后通过自定义脚本读取 `routes/*` 下的所有文件，生成完整的路由数据和菜单配置。
+
+## 总结
+
+折腾一圈下来，起初确实有些沮丧——本来想着彻底摒弃 React Router 库模式，最后只是做了路由拆分这件"小事"。
+
+但回过头看，这次探索并非没有价值。我们从不同方案中汲取了优点，最终找到的折中方案既保留了库模式的灵活性，又通过文件组织方式解决了协作冲突问题。有时候，"小步迭代"反而比"彻底革命"更适合实际项目。
