@@ -1,61 +1,172 @@
 ---
-title: React SPA 项目路由架构实践（2026）【草稿】
+title: React SPA 指北 202604
 date: 2026-04-17
 description: 从 TanStack Router 到 React Router v7，探索现代 React SPA 的路由架构最佳实践
-tags: ["React", "路由", "架构"]
+tags: ["React", "路由", "架构", "AI撰写"]
 ---
 
-2026 年，我开始搭建一个新的 React SPA 项目。背景是老项目使用 React Router v6，维护到后期路由文件长达数千行，多个 feature 并行开发时极易造成 Git 冲突。
+import { GithubRepo } from "@/components/github-repo";
+import { Divider } from "@/components/divider";
 
-新项目依然选择 React 作为基础框架，但我希望从架构层面彻底解决这个问题。
+## TL;DR {#tldr}
 
-## TanStack Router 初探
+使用 `react-router@7` 的库模式提供稳定的基座，参考文件路由的方式将原先聚合的 `RouteObject` 对象打散，开发自定义 `rsbuild` 插件监听文件路由目录生成完整的 `RouteObject` 对象和全部业务路由菜单。
 
-TanStack Router 是近年兴起的 React 路由方案，以类型安全和文件路由著称。
+## 需求背景
 
-一开始一切顺利，直到处理前置路由鉴权和跳转时遇到了问题：
+随着业务的持续推进，我们准备为 B 端用户开放部分运营后台的功能。为了与现有运营后台区分，单独拉一个项目来处理。在开始新项目之前，需要梳理业务迭代习惯和现有项目存在的问题。
 
-1. 在 `__root.tsx` 中编写 loader，处理用户 token、权限数据和路由跳转
-2. 配置了 `pendingComponent` 和 `pendingMs`
-3. 测试时页面直接白屏
+目前的项目使用 `react-router@6` 开发，项目路由都写在 `basicRoutes.tsx` 文件中，内容是一个巨长的 `RouteObject` 对象。同时前期在设计上存在缺陷（我是后续加入的），将路由的 `path` / `title` 抽成一个单独的文件管理，这些数据一方面供 `basicRoutes.tsx` 使用，另一方面供 `antd` 的 `Menu` 组件使用。
 
-这是一个已知的重构导致的 bug（[TanStack/router#7120](https://github.com/TanStack/router/issues/7120)）。考虑到新框架的稳定性风险，我决定转向久经考验的 React Router。
+你可以想象在项目快速迭代的时候，这是多么可怖的一件事了。
 
-## React Router v7 框架模式
+- 添加一个新的路由需要同时修改三个文件
+- 同一个时间节点内迭代多个功能，在最后合并上线代码时，经常需要处理这部分的冲突
+- 当某一个路由承载业务过多时，需要拆分路由的时候，也会经常出现冲突
 
-React Router v7 的框架模式将原先 Remix 的理念融入其中。
+此外，项目整体分好几个大模块，例如全局模块、移动端模块等，每个模块下有对应的子菜单。我们以 `user` 这个路由举例。结合我们刚才说的几个模块，应该有 `/global/user` 和 `/mobile/user` 两个路由。但是，依旧有设计缺陷，共享 `/user` 路由，依靠内存中的某一个数据来区分当前是哪一个模块。
 
-但很快就遇到了问题：
+<Divider />
 
-**问题 1：不支持嵌套文件夹路由**
+新项目也会采取类似的方案，但是希望从设计上避免之前的问题。在后续的实践中，分别使用 `tanstack-router` 和 `react-router@7` 尝试了不同的设计方案。但是整体的思路是保持不变的，即将代码约束在对应的文件中。使用 `routes` 文件夹约束路由信息，使用 `features` 文件夹承载业务组件。
 
-- 被迫调整为扁平路由结构
-- 主要痛点：扁平路由的布局需要用前缀约定。比如授权相关的布局是 `_auth.tsx`，那么所有使用该布局的路由都要加 `_auth` 前缀
-- 解决方案：在根路由设置全局布局，利用 `@react-router/fs-routes` 生成路由数据后，重新组装并通过 layout 函数注入布局组件
+## TanStack Router {#tanstack-router}
 
-**问题 2：菜单生成需要获取所有路由**
+`tanstack-router` 的 `File-Based Routing` 从我的视角上来看，是一份针对我上述需求的完美答案。
 
-- 框架提供了相关 unsafe 接口，但不想使用
-- 解决方案：自定义插件扫描 routes 文件夹，读取 handle 配置并按约定生成路由文件
+```tsx
+├── __root.tsx
+│   ├── global
+│   │   ├── route.tsx
+│   │   ├── user.tsx
+│   ├── mobile
+│   │   ├── route.tsx
+│   │   ├── user
+│   │   │   ├── route.tsx
+│   │   │   ├── list.tsx
+```
 
-但最终让我放弃的是打包产物问题。
+上述结构是 `routes` 文件夹的简化版，遵循了 `tanstack-router` 文件路由的要求。
 
-我的项目思路是：`routes/*` 只存放路由配置，具体业务逻辑在 `features/*` 下开发。这样设计是因为老项目中有先例——不同路由可能复用同一个页面组件，只是调用接口时多传一个 type 参数。
+在 `__root.tsx` 中可以编写 `loader`，用来鉴权，也设置全局通用布局等。`global/route.tsx` 会注册成 `/global` 路由，`global/user.tsx` 注册成 `/global/user` 路由。同时，可以在对应的文件中编写 `staticData` 用来存放当前路由的权限、标题等数据。
 
-然而打包后发现，React Router 强行将 `routes/xxx.tsx` 和 `features/xxx.tsx` 拆分成两个文件，导致产物过于零碎。暂时没找到很好的整合方案，只好放弃。
+在这种约束下，之前头疼的，需要手动维护的巨长文件已然不复存在，取而代之的是每个路由只要管理好自己的数据就好。对于需要拆分路由的情况，上述 `/global` 和 `/global/user` 就是最好的解释。
 
-## React Router v7 库模式
+同样的，得益于 `tanstack-router` 类型安全的特性，我们能约束 `staticData` 的数据类型，保证其内部一定有我们需要的数据。配合 `useRouter` 返回的 `routeTree` 数据，就可以生成后续需要的菜单数据。
 
-最终回归到 React Router 库模式，但融合了 TanStack Router 和框架模式的思路。
+看起来一切都符合要求，应该准备后续的业务迭代了，但是最后还是放弃了。在开发过程中，发现了一个 P0 级别的问题，对于一个商业项目，这是不能接受的。
 
-核心方案：**`routes/*` 管理路由配置，`features/*` 存放业务组件**
+在 `__root.tsx` 编写鉴权 `loader` 时，需要请求后端接口。为了良好的用户体验，设置了 `pendingComponent` 和 `pendingMs` 用来渲染加载态。在后续的测试中发现，跳转函数配合加载态组件会导致页面崩溃。
 
-以权限管理为例，可能有「权限列表」和「权限分配」两个子路由。我在 `routes` 下创建 `permission.tsx`，导出权限模块的全部路由数据。这样后续多个 feature 涉及权限模块时，冲突只会局限在这个文件夹内。
+<GithubRepo url="https://github.com/TanStack/router/issues/7120" />
 
-然后通过自定义脚本读取 `routes/*` 下的所有文件，生成完整的路由数据和菜单配置。
+我在 `github` 上找到了类似问题的 `issues`，因为时间紧迫，我让 AI 协助分析了原因，反馈说 `tanstack-router` 团队最近重构的异步加载模块导致的（因为时间紧迫，我并没有仔细验证）。
 
-## 总结
+于是我尝试将 `loader` 的逻辑转移到全局组件的 `useEffectLayout` 中处理，在简单的测试后，我发现两者不一致的点。假设我们原先访问 `/mobile/user` 路由，在我们校验是否为合法路由时发现，`/mobile/user` 是空页，只是作为菜单的一个根节点存在的，需要跳转到 `mobile/user/list` 去。 在 `loader` 处理重定向时，不会加载 `mobile/user/list` 的业务组件。而在 `useEffectLayout` 中，会先加载业务组件再重定向。出于数据安全隔离考虑，放弃这个解决方案。
 
-折腾一圈下来，起初确实有些沮丧——本来想着彻底摒弃 React Router 库模式，最后只是做了路由拆分这件"小事"。
+考虑到新框架的稳定性风险，我决定转向久经考验且通过广泛测试的 `react-router`。
+
+## React Router {#react-router}
+
+`react-router` 团队将原先的 `remix` 融入 v7 版本，导致一个库有三种不同的用法，同时迭代方式非常激进，内部充斥了大量的 `unsafe_*` api 以及未来 v8 的 **future**。但是，背靠大树好乘凉，**Shopify** 会替我排坑。
+
+在实践过程中，我优先使用了框架模式，在后续遇到了打包相关的问题，进而转向库模式。
+
+### 框架模式
+
+框架模式下的路由配置，在我看来和原先的库模式是没有区别的，我们依旧要维护一个 `app/routes.tsx` 文件，在文件中自行注册路由。但是好在官方提供了 `@react-router/fs-routes` 库，可以自动生成路由配置，但是遗憾的是，暂时只支持扁平路由。
+
+```tsx
+├── global._index.tsx
+├── global.user.tsx
+├── mobile._index.tsx
+├── mobile.user._index.tsx
+├── mobile.user.list.tsx
+├── login.tsx
+```
+
+在插件的帮助下，`global._index.tsx` 会被注册成 `/global`，`global.user.tsx` 被注册成 `/global/user`。
+
+但是这里遇到了一个问题，不同授权状态下的布局是不一样的，于是拦截了 `flatRoutes` 数据，强行塞入布局数据，当然自己手动维护也是可以的。
+
+```tsx
+import { type RouteConfig, layout } from "@react-router/dev/routes";
+import { flatRoutes } from "@react-router/fs-routes";
+
+async function getFlatRoutes() {
+  const allRoutes = await flatRoutes();
+
+  const common = [];
+  const unauth = [];
+  allRoutes.forEach((route) => {
+    isLogin(route) ? common.push(route) : unauth.push(route);
+  });
+
+  return [layout("./auth/layout.tsx", common), ...unauth];
+}
+
+export default getFlatRoutes() satisfies RouteConfig;
+```
+
+至于在 `tanstack-router` 中的 `loader` 和 `pendingComponent` 则在 `app/root.tsx` 文件中处理。
+
+而我们关心的全部路由数据在 **v7** 中由 `UNSAFE_DataRouterContext` 提供，为了避免这类不稳定的因素，我决定不使用此数据，开发自定义插件来解决这个问题。
+
+```tsx
+export default function Route(params: type) {
+  return <Component />;
+}
+
+export const handle = {
+  /* 菜单数据 */
+};
+```
+
+上述是路由文件的模版，其中 `handle` 是 `react-router` 支持的功能，类似于之前的 `staticData`。
+
+自定义插件的思路就很清晰了，文件名就是路由之间的关系，比如 `mobile._index.tsx`、`mobile.user._index.tsx`、`mobile.user.list.tsx`，这些很明显是同一个菜单下的，我们根据规则可以计算出路由以及 `handle` 的层级关系，进而生成一份路由文件供调用。这份文件完全由插件生成，避免了人工维护，后续就算有冲突，也会在启动项目时自动替换成最新文件。
+
+虽然扁平路由让我有一些不舒服，但是解决了问题也不错，但是最后还是没有选取这套方案，最重要的原因是打包时零碎文件太多了。之前我提及过整体的思路是使用 `routes` 文件夹约束路由信息，使用 `features` 文件夹承载业务组件。
+
+<CodeWithTabs>
+
+```tsx !!tabs app/routes/mobile.user.tsx
+import MobileUser from "#/features/mobile-user";
+
+export default function Route(params: type) {
+  return <MobileUser />;
+}
+
+export const handle = {};
+```
+
+```tsx !!tabs app/features/mobile-user.tsx
+export default function MobileUser(params: type) {
+  return <div>{/* ... */}</div>;
+}
+```
+
+</CodeWithTabs>
+
+打包后会存在两个文件 `mobile.user-[hash1].js` 和 `mobile.user-[hash2].js`，为了极致的首屏优化打包成了两个文件，但是这个 SPA 项目，并不在乎首屏时间。考虑到框架模式是为 SSR 准备的，且在开发过程中我们禁用了 `SSR` 但部分逻辑仍保持 `SSR` 的模式，为了解决零碎文件问题以及保证开发线上一致性，最后决定还是转向库模式。
+
+### 库模式
+
+有了前面的经验，库模式的处理就很简单了。
+
+```tsx
+├── global.user.tsx
+├── global.order.tsx
+├── mobile.user.tsx
+├── login.tsx
+```
+
+现在 `global.user` 就不再是 `/global.user` 了，其含义是 `global` 模块下的 `user` 模块，无论是 `/global/user` 还是 `/global/user/list` 的注册都会在这一个文件中处理。
+
+同时改造之前的自定义插件，在返回路由的时候将分散的注册路由对象生成完整的路由树。
+
+## 总结 (AI写的) {#summary}
+
+折腾一圈下来，起初确实有些沮丧——本来想着彻底摒弃 `react-router` 库模式，最后只是做了路由拆分这件"小事"。
 
 但回过头看，这次探索并非没有价值。我们从不同方案中汲取了优点，最终找到的折中方案既保留了库模式的灵活性，又通过文件组织方式解决了协作冲突问题。有时候，"小步迭代"反而比"彻底革命"更适合实际项目。
