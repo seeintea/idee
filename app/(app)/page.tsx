@@ -24,10 +24,18 @@ export default function Index() {
   return (
     <div className={"flex flex-col gap-4"}>
       {documents.map((document) => (
-        <Link key={document.id} href={`/blog${document.id}`}>
-          <div className="flex items-center justify-between">
-            <div className={"font-extrabold text-base"}>{document.meta.title}</div>
-            <div className={"text-secondary text-sm"}>{document.meta.formatDate}</div>
+        <Link
+          key={document.id}
+          href={`/blog${document.id}`}
+          className="group rounded-sm outline-ring/50 focus-visible:outline-2 focus-visible:outline-offset-4"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="font-bold text-base text-primary underline decoration-transparent underline-offset-4 transition-[text-decoration-color,color] duration-150 group-hover:decoration-current">
+              {document.meta.title}
+            </div>
+            <div className="text-secondary text-sm tabular-nums shrink-0 transition-colors duration-150 group-hover:text-primary">
+              {document.meta.formatDate}
+            </div>
           </div>
         </Link>
       ))}
