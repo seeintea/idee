@@ -1,78 +1,20 @@
 "use client";
-// vibe coding
+// vide coding
 import init, { decrypt as wasmDecrypt, encrypt as wasmEncrypt } from "crypto-aes-wasm";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-type BenchmarkRow = {
-  id: "wasm-encrypt" | "wasm-decrypt" | "webcrypto-encrypt" | "webcrypto-decrypt";
-  item: string;
-  ms: string;
-  throughput: string;
-};
-
-type ControlsState = "initializing" | "ready" | "running";
-
-const AES_KEY_BYTES = new Uint8Array([
-  0x78, 0x73, 0x31, 0x30, 0x71, 0x6c, 0x6c, 0x77, 0x34, 0x46, 0x54, 0x63, 0x51, 0x38, 0x59, 0x55,
-]);
-
-const AES_IV_BYTES = new Uint8Array([
-  0x6f, 0x6b, 0x75, 0x6b, 0x4a, 0x76, 0x56, 0x45, 0x38, 0x66, 0x48, 0x49, 0x58, 0x31, 0x4d, 0x79,
-]);
-
-function formatMiBPerSec(bytes: number, ms: number) {
-  const mib = bytes / (1024 * 1024);
-  const sec = ms / 1000;
-  return sec === 0 ? "∞" : (mib / sec).toFixed(2);
-}
-
-function bytesToHex(bytes: Uint8Array) {
-  const hex = new Array(bytes.length);
-  for (let i = 0; i < bytes.length; i++) {
-    hex[i] = bytes[i].toString(16).padStart(2, "0");
-  }
-  return hex.join("");
-}
-
-function hexToBytes(hex: string) {
-  if (hex.length % 2 !== 0) throw new Error("invalid hex length");
-  const out = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < out.length; i++) {
-    const byte = hex.slice(i * 2, i * 2 + 2);
-    out[i] = Number.parseInt(byte, 16);
-  }
-  return out;
-}
-
-function buildPlaintext(size: number) {
-  const base = "0123456789abcdef";
-  let s = "";
-  while (s.length < size) s += base;
-  return s.slice(0, size);
-}
-
-function measureSyncTimeMs<T>(fn: () => T) {
-  const t0 = performance.now();
-  const res = fn();
-  const t1 = performance.now();
-  return { ms: t1 - t0, res };
-}
-
-async function measureAsyncTimeMs<T>(fn: () => Promise<T>) {
-  const t0 = performance.now();
-  const res = await fn();
-  const t1 = performance.now();
-  return { ms: t1 - t0, res };
-}
-
-function createInitialDataSource(): BenchmarkRow[] {
-  return [
-    { id: "wasm-encrypt", item: "WASM encrypt", ms: "-", throughput: "-" },
-    { id: "wasm-decrypt", item: "WASM decrypt", ms: "-", throughput: "-" },
-    { id: "webcrypto-encrypt", item: "WebCrypto AES-CBC encrypt -> hex", ms: "-", throughput: "-" },
-    { id: "webcrypto-decrypt", item: "WebCrypto AES-CBC decrypt (from hex) -> string", ms: "-", throughput: "-" },
-  ];
-}
+import { BenchmarkTable } from "./benchmark-table";
+import { AES_IV_BYTES, AES_KEY_BYTES, createInitialDataSource } from "./constants";
+import { ControlButton, NumberField, StatusTag } from "./primitives";
+import type { BenchmarkRow, ControlsState } from "./types";
+import {
+  buildPlaintext,
+  bytesToHex,
+  formatMiBPerSec,
+  hexToBytes,
+  measureAsyncTimeMs,
+  measureSyncTimeMs,
+} from "./utils";
 
 export function AesPerformance() {
   const [plaintextSizeBytes, setPlaintextSizeBytes] = useState(1024);
@@ -230,71 +172,22 @@ webHex: ${webHex.slice(0, 64)}...`);
   }, [controlsState, iterations, plaintext]);
 
   return (
-    <section>
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="flex flex-col gap-1 text-sm">
-            明文大小（字节）
-            <input
-              className="border rounded px-2 py-1 w-22 h-8"
-              type="number"
-              min={1}
-              step={1}
-              value={plaintextSizeBytes}
-              onChange={(e) => setPlaintextSizeBytes(Number(e.target.value))}
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            循环次数
-            <input
-              className="border rounded px-2 py-1 w-22 h-8"
-              type="number"
-              min={1}
-              step={1}
-              value={iterations}
-              onChange={(e) => setIterations(Number(e.target.value))}
-            />
-          </label>
-          <button
-            type="button"
-            className="border rounded px-2 py-0.5 cursor-pointer h-8"
-            onClick={handleRunBenchmark}
-            disabled={controlsState !== "ready"}
-          >
-            {controlsState === "running" ? "测试中…" : "开始测试"}
-          </button>
-          <button
-            type="button"
-            className="border rounded px-2 py-0.5 cursor-pointer h-8"
-            onClick={handleVerify}
-            disabled={controlsState !== "ready"}
-          >
-            验证一致性
-          </button>
-        </div>
+    <section className="not-prose my-6">
+      <div className="flex flex-wrap items-end gap-3">
+        <NumberField label="明文大小（字节）" value={plaintextSizeBytes} onChange={setPlaintextSizeBytes} />
+        <NumberField label="循环次数" value={iterations} onChange={setIterations} />
+        <ControlButton onClick={handleRunBenchmark} disabled={controlsState !== "ready"}>
+          {controlsState === "running" ? "测试中…" : "开始测试"}
+        </ControlButton>
+        <ControlButton onClick={handleVerify} disabled={controlsState !== "ready"}>
+          验证一致性
+        </ControlButton>
       </div>
-      {errorMessage ? <div className="text-sm text-red-600 mt-6 overflow-hidden">{errorMessage}</div> : null}
-      {validSameHex ? <div className="text-sm mt-6 whitespace-pre-line overflow-hidden">{validSameHex}</div> : null}
-      <div className="overflow-auto mt-6">
-        <table className="border-collapse m-0!">
-          <thead>
-            <tr>
-              <th className="border px-2 py-2 text-left text-sm">项目</th>
-              <th className="border px-2 py-2 text-left text-sm">耗时（ms）</th>
-              <th className="border px-2 py-2 text-left text-sm">吞吐（MiB/s）</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dataSource.map((row) => (
-              <tr key={row.id}>
-                <td className="border px-2 py-2 text-sm">{row.item}</td>
-                <td className="border px-2 py-2 text-sm">{row.ms}</td>
-                <td className="border px-2 py-2 text-sm">{row.throughput}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
+      {errorMessage ? <StatusTag tone="danger">{errorMessage}</StatusTag> : null}
+      {validSameHex ? <StatusTag tone="success">{validSameHex}</StatusTag> : null}
+
+      <BenchmarkTable dataSource={dataSource} />
     </section>
   );
 }

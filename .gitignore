@@ -45,5 +45,4 @@ next-env.d.ts
 
 # vibe coding
 .agents/**/*
-.trae/**/*
 .claude/**/*

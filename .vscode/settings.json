@@ -1,5 +1,21 @@
 {
-  "cSpell.words": ["IDÉE", "idee", "embla", "codehike", "recma", "rslog", "frontmatter", "ioskeley", "tinyexec"],
+  "cSpell.words": [
+    "codehike",
+    "embla",
+    "frontmatter",
+    "ioskeley",
+    "nums",
+    "recma",
+    "rslog",
+    "tinyexec",
+    "oklch",
+    "vercel",
+
+    // user refer
+    "levie_gu",
+    "IDÉE",
+    "idee"
+  ],
   "editor.formatOnSave": true,
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -7,5 +23,11 @@
   "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
   "editor.codeActionsOnSave": {
     "source.organizeImports.biome": "explicit"
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "tailwindCSS.includeLanguages": {
+    "css": "tailwindcss"
   }
 }

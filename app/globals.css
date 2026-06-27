@@ -29,7 +29,7 @@
 }
 
 .dark {
-  --background: oklch(0.13 0.028 261.692);
+  --background: oklch(0 0 0);
   --foreground: oklch(0.985 0.002 247.839);
   --border: oklch(1 0 0 / 10%);
   --ring: oklch(0.551 0.027 264.364);

@@ -20,7 +20,7 @@ const THEME_OPTIONS = [
 const ITEM_CLASS_NAME =
   "relative z-10 rounded-full size-5 flex items-center justify-center cursor-pointer text-gray-950/70 transition-colors dark:text-white/70 data-checked:text-gray-950 dark:data-checked:text-white";
 
-const INDICATOR_CLASS_NAME = "pointer-events-none absolute rounded-full size-5 bg-white shadow-sm dark:bg-gray-700";
+const INDICATOR_CLASS_NAME = "pointer-events-none absolute rounded-full size-5 bg-white shadow-sm dark:bg-zinc-700";
 
 function isValidThemePreference(value: unknown): value is ThemePreference {
   return THEME_OPTIONS.some((option) => option.value === value);

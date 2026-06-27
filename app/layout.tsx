@@ -12,7 +12,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: { default: "IDÉE", template: "%s | IDÉE" },
-  description: "My personal website.",
+  description: "Posts and notes by leviegu.",
   robots: {
     index: true,
     follow: true,
@@ -27,14 +27,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     title: "IDÉE",
-    description: "My personal website.",
+    description: "Posts and notes by leviegu.",
     siteName: "IDÉE",
     images: ["/avatar.webp"],
   },
   twitter: {
     card: "summary",
     title: "IDÉE",
-    description: "My personal website.",
+    description: "Posts and notes by leviegu.",
     creator: "@levie_gu",
     images: ["/avatar.webp"],
   },
