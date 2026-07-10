@@ -29,7 +29,7 @@ export default function Index() {
           href={`/blog${document.id}`}
           className="group rounded-sm outline-ring/50 focus-visible:outline-2 focus-visible:outline-offset-4"
         >
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-baseline justify-between gap-4">
             <div className="font-bold text-base text-primary underline decoration-transparent underline-offset-4 transition-[text-decoration-color,color] duration-150 group-hover:decoration-current">
               {document.meta.title}
             </div>
