@@ -1,8 +1,8 @@
 ---
-title: React SPA 指北 202604
+title: 现代 React SPA 路由实践：从 TanStack Router 到 React Router v7
 date: 2026-04-17
-description: 从 TanStack Router 到 React Router v7，探索现代 React SPA 的路由架构最佳实践
-tags: ["React", "路由", "架构", "AI撰写"]
+description: 在真实 B 端项目中比较两套路由方案，并用文件约定与构建插件改善协作体验
+tags: ["React", "路由", "架构", "AI 撰写"]
 ---
 
 import { GithubRepo } from "@/components/github-repo";
@@ -10,7 +10,7 @@ import { Divider } from "@/components/divider";
 
 ## TL;DR {#tldr}
 
-使用 `react-router@7` 的库模式提供稳定的基座，参考文件路由的方式将原先聚合的 `RouteObject` 对象打散，开发自定义 `rsbuild` 插件监听文件路由目录生成完整的 `RouteObject` 对象和全部业务路由菜单。
+使用 `react-router@7` 的库模式作为稳定基座，参考文件路由的组织方式，将原先聚合的 `RouteObject` 拆散；再开发自定义 Rsbuild 插件，监听路由目录并生成完整的路由树与业务菜单。
 
 ## 需求背景
 
@@ -28,11 +28,11 @@ import { Divider } from "@/components/divider";
 
 <Divider />
 
-新项目也会采取类似的方案，但是希望从设计上避免之前的问题。在后续的实践中，分别使用 `tanstack-router` 和 `react-router@7` 尝试了不同的设计方案。但是整体的思路是保持不变的，即将代码约束在对应的文件中。使用 `routes` 文件夹约束路由信息，使用 `features` 文件夹承载业务组件。
+新项目也会采取类似的方案，但是希望从设计上避免之前的问题。在后续的实践中，分别使用 TanStack Router 和 `react-router@7` 尝试了不同的设计方案。但是整体的思路是保持不变的，即将代码约束在对应的文件中。使用 `routes` 文件夹约束路由信息，使用 `features` 文件夹承载业务组件。
 
 ## TanStack Router {#tanstack-router}
 
-`tanstack-router` 的 `File-Based Routing` 从我的视角上来看，是一份针对我上述需求的完美答案。
+TanStack Router 的 `File-Based Routing` 从我的视角上来看，是一份针对我上述需求的完美答案。
 
 ```tsx
 ├── __root.tsx
@@ -46,13 +46,13 @@ import { Divider } from "@/components/divider";
 │   │   │   ├── list.tsx
 ```
 
-上述结构是 `routes` 文件夹的简化版，遵循了 `tanstack-router` 文件路由的要求。
+上述结构是 `routes` 文件夹的简化版，遵循了 TanStack Router 文件路由的要求。
 
 在 `__root.tsx` 中可以编写 `loader`，用来鉴权，也设置全局通用布局等。`global/route.tsx` 会注册成 `/global` 路由，`global/user.tsx` 注册成 `/global/user` 路由。同时，可以在对应的文件中编写 `staticData` 用来存放当前路由的权限、标题等数据。
 
 在这种约束下，之前头疼的，需要手动维护的巨长文件已然不复存在，取而代之的是每个路由只要管理好自己的数据就好。对于需要拆分路由的情况，上述 `/global` 和 `/global/user` 就是最好的解释。
 
-同样的，得益于 `tanstack-router` 类型安全的特性，我们能约束 `staticData` 的数据类型，保证其内部一定有我们需要的数据。配合 `useRouter` 返回的 `routeTree` 数据，就可以生成后续需要的菜单数据。
+同样的，得益于 TanStack Router 类型安全的特性，我们能约束 `staticData` 的数据类型，保证其内部一定有我们需要的数据。配合 `useRouter` 返回的 `routeTree` 数据，就可以生成后续需要的菜单数据。
 
 看起来一切都符合要求，应该准备后续的业务迭代了，但是最后还是放弃了。在开发过程中，发现了一个 P0 级别的问题，对于一个商业项目，这是不能接受的。
 
@@ -60,15 +60,15 @@ import { Divider } from "@/components/divider";
 
 <GithubRepo url="https://github.com/TanStack/router/issues/7120" />
 
-我在 `github` 上找到了类似问题的 `issues`，因为时间紧迫，我让 AI 协助分析了原因，反馈说 `tanstack-router` 团队最近重构的异步加载模块导致的（因为时间紧迫，我并没有仔细验证）。
+我在 GitHub 上找到了类似问题的 issue，因为时间紧迫，我让 AI 协助分析了原因，反馈说 TanStack Router 团队最近重构的异步加载模块导致的（因为时间紧迫，我并没有仔细验证）。
 
 于是我尝试将 `loader` 的逻辑转移到全局组件的 `useEffectLayout` 中处理，在简单的测试后，我发现两者不一致的点。假设我们原先访问 `/mobile/user` 路由，在我们校验是否为合法路由时发现，`/mobile/user` 是空页，只是作为菜单的一个根节点存在的，需要跳转到 `mobile/user/list` 去。 在 `loader` 处理重定向时，不会加载 `mobile/user/list` 的业务组件。而在 `useEffectLayout` 中，会先加载业务组件再重定向。出于数据安全隔离考虑，放弃这个解决方案。
 
-考虑到新框架的稳定性风险，我决定转向久经考验且通过广泛测试的 `react-router`。
+考虑到新框架的稳定性风险，我决定转向久经考验且通过广泛测试的 React Router。
 
 ## React Router {#react-router}
 
-`react-router` 团队将原先的 `remix` 融入 v7 版本，导致一个库有三种不同的用法，同时迭代方式非常激进，内部充斥了大量的 `unsafe_*` api 以及未来 v8 的 **future**。但是，背靠大树好乘凉，**Shopify** 会替我排坑。
+React Router 团队将原先的 Remix 融入 v7 版本，导致一个库有三种不同的用法，同时迭代方式非常激进，内部充斥了大量的 `unsafe_*` API 以及未来 v8 的 **future**。但是，背靠大树好乘凉，**Shopify** 会替我排坑。
 
 在实践过程中，我优先使用了框架模式，在后续遇到了打包相关的问题，进而转向库模式。
 
@@ -108,7 +108,7 @@ async function getFlatRoutes() {
 export default getFlatRoutes() satisfies RouteConfig;
 ```
 
-至于在 `tanstack-router` 中的 `loader` 和 `pendingComponent` 则在 `app/root.tsx` 文件中处理。
+至于在 TanStack Router 中的 `loader` 和 `pendingComponent` 则在 `app/root.tsx` 文件中处理。
 
 而我们关心的全部路由数据在 **v7** 中由 `UNSAFE_DataRouterContext` 提供，为了避免这类不稳定的因素，我决定不使用此数据，开发自定义插件来解决这个问题。
 
@@ -117,12 +117,10 @@ export default function Route(params: type) {
   return <Component />;
 }
 
-export const handle = {
-  /* 菜单数据 */
-};
+export const handle = {/* 菜单数据 */};
 ```
 
-上述是路由文件的模版，其中 `handle` 是 `react-router` 支持的功能，类似于之前的 `staticData`。
+上述是路由文件的模版，其中 `handle` 是 React Router 支持的功能，类似于之前的 `staticData`。
 
 自定义插件的思路就很清晰了，文件名就是路由之间的关系，比如 `mobile._index.tsx`、`mobile.user._index.tsx`、`mobile.user.list.tsx`，这些很明显是同一个菜单下的，我们根据规则可以计算出路由以及 `handle` 的层级关系，进而生成一份路由文件供调用。这份文件完全由插件生成，避免了人工维护，后续就算有冲突，也会在启动项目时自动替换成最新文件。
 
@@ -165,8 +163,8 @@ export default function MobileUser(params: type) {
 
 同时改造之前的自定义插件，在返回路由的时候将分散的注册路由对象生成完整的路由树。
 
-## 总结 (AI写的) {#summary}
+## 总结 {#summary}
 
-折腾一圈下来，起初确实有些沮丧——本来想着彻底摒弃 `react-router` 库模式，最后只是做了路由拆分这件"小事"。
+折腾一圈下来，起初确实有些沮丧——本来想着彻底摒弃 React Router 库模式，最后只是做了路由拆分这件"小事"。
 
 但回过头看，这次探索并非没有价值。我们从不同方案中汲取了优点，最终找到的折中方案既保留了库模式的灵活性，又通过文件组织方式解决了协作冲突问题。有时候，"小步迭代"反而比"彻底革命"更适合实际项目。
