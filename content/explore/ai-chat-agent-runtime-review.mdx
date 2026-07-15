@@ -1,0 +1,244 @@
+---
+title: 从 useAgent 到 Agent Runtime：一次 AI Chat 状态设计复盘
+date: 2026-07-15
+description: 从多轮对话、任务队列到框架无关 Runtime，复盘一次 AI Chat 状态模型的演进
+tags: ["AI", "React", "架构", "开发复盘"]
+---
+
+最近在开发一个 AI Chat 功能。最初的目标并不复杂：接入自定义 Provider，实现多轮对话、流式响应和停止生成。真正开始设计后，我才发现，一个看似普通的聊天 Hook，背后同时涉及消息建模、任务调度、上下文构造、流式更新和状态一致性。
+
+这篇文章不打算介绍如何调用某个模型 API，而是复盘 `useAgent` 从简单聊天状态逐渐演变成轻量 Agent Runtime 的过程，以及其中几次比较重要的设计转向。
+
+## 从一个能工作的 Hook 开始
+
+第一版 `useAgent` 解决的是最直接的问题：
+
+- 保存用户与 AI 的消息历史
+- 每次请求自动携带此前的对话
+- 流式更新当前 assistant 消息
+- 支持停止生成和清空会话
+- 防止同一时间重复提交请求
+
+对于几十轮普通对话，这样的实现已经足够。但随着对数据量和后续功能的考虑，一些问题开始出现。
+
+首先，每收到一个流式 chunk 就更新一次 React State，会产生大量状态计算和组件渲染。其次，每次请求都携带完整历史，迟早会触及模型的上下文上限。所有消息也都保存在组件内存中，页面刷新后会丢失，数据量上升后 Markdown 渲染也会成为负担。
+
+因此，流式内容后来改成先进入 buffer，再以约 40ms 的间隔批量刷新。它没有改变功能，却显著减少了 React 更新次数。这也是这次开发中很典型的一类优化：性能问题不一定需要复杂的数据结构，先减少不必要的更新频率，往往就能获得明显收益。
+
+## 一问一答并不等于一次执行
+
+在设计队列时，我最初考虑把一次用户输入和一次 AI 输出包装成一个 `Turn`：
+
+```text
+Turn
+├── user message
+└── assistant message
+```
+
+这个结构很直观，但很快就被推翻了。因为一次 AI 请求未必只产生一条回答：
+
+- 模型可能产生多条输出
+- 回答中可能穿插工具调用或工具结果
+- 应用可能根据模型输出生成一条交互卡片
+- 系统可能插入 synthetic/mock 消息
+- 一次执行也可能没有最终文本输出
+
+如果把 `Turn` 固定为“一问一答”，这些能力都会被迫塞进同一条消息，或者绕过既有模型。
+
+最终，我把“展示的数据”和“执行任务”拆成了两个实体。
+
+```ts
+interface AgentMessage {
+  id: string;
+  role: "user" | "assistant" | "system" | "tool";
+  source: "user" | "model" | "synthetic" | "system" | "tool";
+  content: AgentMessageContent;
+  status: AgentMessageStatus;
+  createdAt: number;
+}
+
+interface AgentRun {
+  id: string;
+  inputMessage: AgentMessage | null;
+  outputMessages: AgentMessage[];
+  status: AgentRunStatus;
+  providerId: string;
+  createdAt: number;
+  startedAt: number | null;
+  completedAt: number | null;
+}
+```
+
+`Message` 负责内容与 UI 展示，`Run` 负责一次异步执行。普通 Provider Run 由一条用户消息触发，但可以产生零到多条输出；当前实现还为独立 synthetic 消息保留了没有输入的 Run。
+
+这两个概念分开后，很多边界也随之清晰起来：模型上下文不再等同于 UI 消息列表，synthetic 消息也不必默认发送给模型；消息的 `id` 用于渲染和流式定位，而它属于哪个 Run，则可以由父级嵌套关系表达。
+
+## completed、active 与 pending
+
+为了允许用户在 AI 生成期间继续输入，运行状态被拆成三段：
+
+```ts
+interface AgentState {
+  completedRuns: AgentRun[];
+  activeRun: AgentRun | null;
+  pendingRuns: PendingRun[];
+}
+```
+
+它本质上是一个单消费者 FIFO 队列：
+
+```text
+pendingRuns → activeRun → completedRuns
+```
+
+其中：
+
+- `completedRuns` 基本只有追加操作
+- `activeRun` 承担高频的流式更新
+- `pendingRuns` 保存尚未执行的任务
+
+一开始，pending 使用“数组 + `pendingHead` 游标”消费，避免频繁执行 `shift()`。但实际讨论后，我选择删除游标，直接让 `pendingRuns` 始终表示真实的等待队列。
+
+游标在理论上减少了数组头部删除的成本，却增加了更多状态约束：删除、清空和重排任务时都要同步维护 `pendingHead`，UI 读取时也必须额外 `slice()`。聊天输入的等待队列通常不会达到需要在意这点复制成本的规模，因此这里更应该优先保证数据容易理解。
+
+Pending 的数据也被进一步收紧。等待执行时不需要输出、错误、开始时间或完成时间，只保留真正必要的信息：
+
+```ts
+interface PendingRun {
+  id: string;
+  inputMessage: AgentMessage;
+  providerId: string;
+  createdAt: number;
+}
+```
+
+当任务进入 active 时，再补齐运行阶段所需的字段。
+
+这里还有一个尚未被真实业务使用的扩展点：`appendSyntheticOutput()`。它允许应用主动追加一条 AI 样式的交互消息，也正是 `AgentRun.inputMessage` 暂时允许为 `null` 的原因。继续复盘后，我更倾向于在真正出现交互卡片需求前移除这层预设，但这次只记录结论，没有继续调整实现。
+
+## 为什么 inputMessage 最终是单条
+
+`inputMessage` 最初被定义成数组，为未来可能存在的多输入场景留出空间。但继续分析后发现，这种扩展其实混淆了“本次执行的触发消息”和“本次请求的模型上下文”。
+
+一次 Run 由一条用户消息触发。此前的用户输入、历史回答和系统指令属于 Context Builder 负责组装的上下文，不应该重复复制到当前 Run 的输入中。
+
+即使未来出现“用户输入 A，生成期间又用 B 打断并补充”的场景，新 Run 的直接输入仍然是 B；A 可以通过历史上下文和 Run 之间的关联进入请求，而不是把 `inputMessage` 重新扩展为数组。
+
+这个调整让我重新意识到：为了假设中的需求提前放宽类型，并不一定是在保留扩展性。有时它只是在放弃当前已经明确的领域约束。
+
+## 拆分 Hook 带来的新问题
+
+随着职责逐渐清晰，一个很自然的想法是把三段状态分别拆成：
+
+```text
+useCompletedRuns
+useActiveRun
+usePendingRuns
+```
+
+每个 Hook 拥有自己的 State，并提供各自的读写接口。completed 提供 `append()`，pending 提供 `enqueue()` / `dequeue()`，active 负责执行和取消。
+
+但这样做会引入新的状态一致性问题。
+
+```ts
+pending.enqueue(run);
+const next = pending.dequeue();
+```
+
+React State 更新是异步的。执行 `enqueue()` 后，当前闭包中的 pending 仍然可能是旧值，紧接着调用 `dequeue()` 并不能保证取到刚加入的数据。
+
+任务完成时问题更明显：
+
+```text
+active → completed
+pending[0] → active
+pending.slice(1) → pending
+```
+
+这不是三个互不相关的更新，而是一次必须保持原子性的状态迁移。如果三份数据分别由三个 Hook 管理，中间状态可能短暂失去一致性，也更容易受到 stale closure 的影响。
+
+因此，**逻辑上的三个职责，并不意味着物理上的三个状态源**。当前实现继续使用同一个 reducer 管理 completed、active 与 pending，通过单个 action 完成任务迁移；网络请求和流式副作用则留在 effect 中执行。
+
+## 从 React Hook 走向 Agent Runtime
+
+继续对照一些成熟 SDK 的思路后，我发现它们通常不会让 React State 成为执行系统的数据源。更常见的做法，是由框架外部的 Chat 或 Runtime 实例持有状态，再让 React、Vue 或其他框架负责订阅。
+
+```text
+AgentRuntime
+├── completedRuns
+├── activeRun
+├── pendingRuns
+├── enqueue()
+├── cancel()
+└── subscribe()
+
+React
+└── useAgent(runtime)
+```
+
+这样做有几个直接好处：
+
+- 异步任务始终读取 Runtime 中的最新状态
+- 状态迁移不依赖 React 的渲染时机
+- Runtime 可以脱离 UI 单独测试
+- 多个组件可以订阅同一份会话状态
+- 页面卸载不一定意味着任务终止
+- 核心能力可以适配不同前端框架
+- 后续更容易接入持久化、后台执行与恢复
+
+不过，迁移数据所有权不等于失去访问入口。未来的 `useAgent` 仍然可以对 UI 返回完整数据和领域操作，只是它不再亲自保存和修改这些状态。
+
+```ts
+const { messages, completedRuns, activeRun, pendingRuns, enqueueUserMessage, cancelActiveRun } = useAgent(runtime);
+```
+
+对组件来说，使用方式没有太大变化；变化的是底层状态由谁拥有。
+
+## 历史记录不属于当前交互缓存
+
+这次讨论还区分了两种容易混在一起的数据：
+
+```text
+持久化历史
+└── 已经保存的旧会话，只读加载或分页读取
+
+当前交互
+├── 本次已完成的 Run
+├── 当前执行的 Run
+└── 等待执行的 Run
+```
+
+当前 `completedRuns` 只是本次页面生命周期里的内存数据，不应该长期承担数据库职责。未来引入持久化后，历史记录应由 Conversation Store 或 Repository 管理，聊天层只加载当前页面需要展示的部分。
+
+最终显示的消息，可以来自“最近一段持久化历史 + 当前交互状态”的组合，而不需要把所有历史永久塞进一个 Hook。
+
+## 一个不起眼但重要的 UI 细节
+
+状态模型之外，这次还实现了消息区域的智能滚动。最初的需求只是让 AI 输出时滚动条自动向下，但如果每次内容变化都强制滚到底部，用户向上阅读历史消息时就会不断被拉回。
+
+最终采用的规则是：
+
+- 用户位于底部附近时，自动跟随流式输出
+- 用户主动向上滚动后，暂停自动跟随
+- 用户回到底部后，恢复跟随
+- 流式阶段即时定位，手动回到底部时使用平滑滚动
+
+这个功能和 Agent Runtime 没有直接关系，却让我意识到 AI Chat 的交互体验往往藏在这些边界中。功能“能用”和真正适合长时间使用，中间还有很多细小但必要的设计。
+
+## 当前结论
+
+经过这轮开发，当前形成的结论是：
+
+1. `Message` 与 `Run` 应该分离，避免把一次执行限制成一问一答。
+2. 普通 Provider Run 由单条消息触发，可以产生多条输出。
+3. completed、active 与 pending 是三个职责，但属于同一个状态机。
+4. 当前继续使用单一 reducer，保证关键迁移原子完成。
+5. 模型上下文由独立的 Context Builder 构造，不等同于 UI 消息列表。
+6. 持久化历史与当前交互缓存应该分开管理。
+7. 未来真正值得做的拆分，是框架无关的 `AgentRuntime` 与轻量 React 订阅层。
+
+目前我没有急着把现有代码迁移成 Runtime。现阶段的 reducer 方案已经能正确工作，过早重构只会增加复杂度。但这次讨论至少明确了未来的方向：`useAgent` 不应该无限膨胀成一个同时负责状态、队列、请求、持久化和 UI 派生的万能 Hook。
+
+回过头看，这次开发最有价值的部分，并不是完成了多轮对话或自动滚动，而是逐渐厘清了几个看似相似、实际上职责完全不同的概念：消息、执行、上下文、队列与历史。
+
+当这些边界足够清晰后，代码如何拆分反而成了相对简单的事情。
