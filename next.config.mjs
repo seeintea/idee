@@ -17,7 +17,7 @@ const nextConfig = {
   reactCompiler: true,
   pageExtensions: ["tsx", "ts", "js", "jsx"],
   experimental: {
-    viewTransition: true,
+    turbopackRustReactCompiler: true,
   },
 };
 
