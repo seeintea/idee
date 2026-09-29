@@ -18,7 +18,7 @@ import { GithubRepo } from "@/components/github-repo";
 
 这是一个典型的“利用下班后时间”完成的项目：每天下班回家花一点时间，推进 1–2 个小功能。虽然进度不快，但这种细水长流的节奏让我有足够的空间去思考架构，也能持续获得“看着项目一点点搭起来”的成就感。
 
-## Vibe Coding 体验
+## Vibe Coding 体验 {#vibe-coding-experience}
 
 在这个项目中，我尝试了一种更激进的协作模式：**以 AI 编写为主，人工经验为辅**。
 
@@ -57,14 +57,14 @@ import { GithubRepo } from "@/components/github-repo";
 
 虽然整体节奏是“小步快跑”，但经过一段时间的积累，**goi** 已经具备较为完整的核心功能。
 
-### 用户端 (App)
+### 用户端 (App) {#app}
 
 用户端主要面向个人用户，专注于日常数据的记录与查看。
 
 - **多账本/空间**: 支持创建和切换不同的账本空间，实现数据隔离。
 - **数据记录**: 快速记录日常数据，支持自定义分类与标签管理。
 
-### 管理后台 (Admin)
+### 管理后台 (Admin) {#admin}
 
 管理后台是整个系统的控制中枢，负责对 To C 核心数据进行配置与管理。
 
@@ -92,7 +92,7 @@ import { GithubRepo } from "@/components/github-repo";
 
 最终我确立了 **“Build First”** 的策略：公共包先构建再引用。构建工具也从 `tsc` 升级到 **Rslib** 以提升性能，配合自定义的 Nx Scripts 与 Biome/Prettier 工具链，最终落地了一套稳定高效的工程化体系。
 
-### Vibe Coding 经验总结
+### Vibe Coding 经验总结 {#vibe-coding-summary}
 
 在使用 AI 辅助编程的过程中，我也总结出了一些心得：
 

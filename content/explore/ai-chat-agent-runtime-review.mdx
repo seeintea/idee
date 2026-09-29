@@ -9,7 +9,7 @@ tags: ["AI", "React", "架构", "开发复盘"]
 
 这篇文章不打算介绍如何调用某个模型 API，而是复盘 `useAgent` 从简单聊天状态逐渐演变成轻量 Agent Runtime 的过程，以及其中几次比较重要的设计转向。
 
-## 从一个能工作的 Hook 开始
+## 从一个能工作的 Hook 开始 {#form-hook}
 
 第一版 `useAgent` 解决的是最直接的问题：
 
@@ -73,7 +73,7 @@ interface AgentRun {
 
 这两个概念分开后，很多边界也随之清晰起来：模型上下文不再等同于 UI 消息列表，synthetic 消息也不必默认发送给模型；消息的 `id` 用于渲染和流式定位，而它属于哪个 Run，则可以由父级嵌套关系表达。
 
-## completed、active 与 pending
+## completed、active 与 pending {#chat-status}
 
 为了允许用户在 AI 生成期间继续输入，运行状态被拆成三段：
 
@@ -116,7 +116,7 @@ interface PendingRun {
 
 这里还有一个尚未被真实业务使用的扩展点：`appendSyntheticOutput()`。它允许应用主动追加一条 AI 样式的交互消息，也正是 `AgentRun.inputMessage` 暂时允许为 `null` 的原因。继续复盘后，我更倾向于在真正出现交互卡片需求前移除这层预设，但这次只记录结论，没有继续调整实现。
 
-## 为什么 inputMessage 最终是单条
+## 为什么 inputMessage 最终是单条 {#single-input-message}
 
 `inputMessage` 最初被定义成数组，为未来可能存在的多输入场景留出空间。但继续分析后发现，这种扩展其实混淆了“本次执行的触发消息”和“本次请求的模型上下文”。
 
@@ -126,7 +126,7 @@ interface PendingRun {
 
 这个调整让我重新意识到：为了假设中的需求提前放宽类型，并不一定是在保留扩展性。有时它只是在放弃当前已经明确的领域约束。
 
-## 拆分 Hook 带来的新问题
+## 拆分 Hook 带来的新问题 {#split-hook}
 
 随着职责逐渐清晰，一个很自然的想法是把三段状态分别拆成：
 
@@ -159,7 +159,7 @@ pending.slice(1) → pending
 
 因此，**逻辑上的三个职责，并不意味着物理上的三个状态源**。当前实现继续使用同一个 reducer 管理 completed、active 与 pending，通过单个 action 完成任务迁移；网络请求和流式副作用则留在 effect 中执行。
 
-## 从 React Hook 走向 Agent Runtime
+## 从 React Hook 走向 Agent Runtime {#agent-runtime}
 
 继续对照一些成熟 SDK 的思路后，我发现它们通常不会让 React State 成为执行系统的数据源。更常见的做法，是由框架外部的 Chat 或 Runtime 实例持有状态，再让 React、Vue 或其他框架负责订阅。
 
@@ -212,7 +212,7 @@ const { messages, completedRuns, activeRun, pendingRuns, enqueueUserMessage, can
 
 最终显示的消息，可以来自“最近一段持久化历史 + 当前交互状态”的组合，而不需要把所有历史永久塞进一个 Hook。
 
-## 一个不起眼但重要的 UI 细节
+## 一个不起眼但重要的 UI 细节 {#ui-details}
 
 状态模型之外，这次还实现了消息区域的智能滚动。最初的需求只是让 AI 输出时滚动条自动向下，但如果每次内容变化都强制滚到底部，用户向上阅读历史消息时就会不断被拉回。
 
