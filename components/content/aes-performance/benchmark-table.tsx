@@ -1,26 +1,12 @@
+import { Table, type TableColumn } from "@/components/table";
 import type { BenchmarkRow } from "./types";
 
+const columns = [
+  { key: "item", title: "项目" },
+  { key: "ms", title: "耗时（ms）", align: "right", className: "font-ioskeley tabular-nums" },
+  { key: "throughput", title: "吞吐（MiB/s）", align: "right", className: "font-ioskeley tabular-nums" },
+] satisfies TableColumn<BenchmarkRow>[];
+
 export function BenchmarkTable({ dataSource }: { dataSource: BenchmarkRow[] }) {
-  return (
-    <div className="mt-4 overflow-x-auto">
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr className="text-left text-secondary border-b border-border">
-            <th className="px-3 py-2 font-medium">项目</th>
-            <th className="px-3 py-2 font-medium text-right">耗时（ms）</th>
-            <th className="px-3 py-2 font-medium text-right">吞吐（MiB/s）</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dataSource.map((row) => (
-            <tr key={row.id} className="border-b border-border last:border-b-0">
-              <td className="px-3 py-2 text-primary">{row.item}</td>
-              <td className="px-3 py-2 text-primary font-ioskeley tabular-nums text-right">{row.ms}</td>
-              <td className="px-3 py-2 text-primary font-ioskeley tabular-nums text-right">{row.throughput}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  return <Table columns={columns} dataSource={dataSource} className="mt-4 mb-0" />;
 }
